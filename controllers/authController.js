@@ -23,11 +23,14 @@ const signUp = catchAsync(async (req, res, next) => {
 
 // Controlador para /login
 const login = catchAsync(async (req, res, next) => {
-  const { token, userData } = await loginUser(req.body);
+
+  const tenantId = req.tenant.id
+
+  const { token } = await loginUser(req.body, tenantId);
 
   res.status(200).json({
     status: "success",
-    data: { token, userData },
+    data: { token },
   });
 });
 

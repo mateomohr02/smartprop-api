@@ -1,5 +1,9 @@
-const router = require('express').Router();
+const {
+  createUser
+} = require("../controllers/userController");
 
-router.get('/')
+const router = require("express").Router();
+
+router.route("/create").post(createUser);
 
 module.exports = router;

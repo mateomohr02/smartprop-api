@@ -1,9 +1,9 @@
+const bcrypt = require("bcryptjs");
 const { User } = require("../../db/models");
 const AppError = require("../../utils/appError");
 const {
   generateToken,
-  validateEmail,
-  verifyToken,
+  validateEmail
 } = require("./auth.helpers");
 
 const registerUser = async ({ name, email, password }) => {
@@ -24,50 +24,31 @@ const registerUser = async ({ name, email, password }) => {
   return newUser;
 };
 
-const loginUser = async ({ email, password }) => {
+const loginUser = async ({ email, password }, tenantId) => {
+  
   if (!email || !password) {
     throw new AppError("Please provide email and password", 400);
   }
 
-  const user = await User.findOne({ where: { email } });
+  const user = await User.findOne({ where: { email , tenantId} });
+
   if (!user) {
-    throw new AppError("Incorrect Email", 401);
+    throw new AppError("Incorrect Credentials", 401);
   }
 
-  const passwordMatch = password === user.password; // ⚠️ Usa bcrypt en producción
+  const passwordMatch = bcrypt.compare(password, user.password);
+
   if (!passwordMatch) {
     throw new AppError("Incorrect Password", 401);
   }
 
   const token = generateToken({ id: user.id });
 
-  const userData = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    userType: user.userType,
-  };
-
-  return { token, userData };
+  return { token };
 };
 
-const authenticateToken = async (token) => {
-  if (!token) {
-    throw new AppError("Please login to get access", 401);
-  }
-
-  const decoded = verifyToken(token);
-  const user = await User.findByPk(decoded.id);
-
-  if (!user) {
-    throw new AppError("User not validated. Please login again.", 401);
-  }
-
-  return user;
-};
 
 module.exports = {
   registerUser,
-  loginUser,
-  authenticateToken,
+  loginUser
 };
