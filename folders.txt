@@ -1,0 +1,36 @@
+ayudame a crear el backend de mi proyecto: 
+quiero separar la lógica del backend de la siguiente manera:
+
+/api
+    /config
+        cloudinary.js
+        config.js
+        database.js
+        multer.js
+    /controllers
+        authController.js
+        errorController.js
+        ... el resto de mis controladores
+    /db
+        /migrations
+        ... migration files
+        /models
+            index.js
+            User.js
+            ... más modelos
+    /routes
+        appRouter.js
+        authRouter.js
+        ... más rutas
+    /services
+        /auth
+            auth.helpers.js
+            auth.service.js
+        /user
+            ... misma lógica
+    /utils
+        appError.js
+        catchAsync.js
+    -app.js
+
+ 
