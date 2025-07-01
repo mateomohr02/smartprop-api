@@ -22,6 +22,22 @@ const addTenant = async ({name, email, domain}) => {
     return newTenant
 }
 
+const findTenant = async ( id ) => {
+    
+    if(!id) {
+        throw new AppError("Missing id to find Tenant", 400);
+    }
+
+    const tenant = await Tenant.findByPk(id);
+
+    if (!tenant) {
+        throw new AppError(`Tenant not found id: ${id}`, 409);
+    }
+
+    return tenant;
+}
+
 module.exports = {
-  addTenant
+  addTenant,
+  findTenant
 }
