@@ -1,4 +1,4 @@
-const { Property } = require("../../db/models");
+const { Property, Features, PropertyType, City, Neighborhood } = require("../../db/models");
 const AppError = require("../../utils/appError");
 const { nameFormatter, slugFormatter } = require("../../utils/stringFormatter");
 const { fetchandCreateCharacteristics } = require("./characteristic.service");
@@ -149,6 +149,63 @@ const addProperty = async (
   return { newProp, featureProp };
 };
 
+const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
+  console.log("DATA INCOMING SERVICE", limit, page, offset, tenantId);
+
+  if (
+    [limit, page, offset].some((val) => typeof val !== "number") ||
+    !tenantId
+  ) {
+    throw new AppError(
+      "Any of the required parameters to fetch properties is missing.",
+      401
+    );
+  }
+
+  console.log("DATA INCOMING SERVICE", limit, page, offset, tenantId);
+
+  const props = await Property.findAndCountAll({
+    where: {
+      tenantId,
+    },
+    limit,
+    offset,
+    attributes: [
+      "id",
+      "title",
+      "slug",
+      "price",
+      "priceFIAT",
+      "expenses",
+      "expensesFIAT",
+      "surface",
+      "multimedia",
+      "operation",
+      "visualizations",
+    ],
+    include: [
+      {
+        model: Features,
+      },
+      {
+        model: PropertyType,
+        attributes: ["name"],
+      },
+      {
+        model: City,
+        attributes: ["name"],
+      },
+      {
+        model: Neighborhood,
+        attributes: ["name"],
+      },
+    ],
+  });
+
+  return props;
+};
+
 module.exports = {
   addProperty,
+  fetchPropertiesTenantId,
 };

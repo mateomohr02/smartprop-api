@@ -16,6 +16,9 @@ const resolveTenant = async (req, res, next) => {
   }
   
   req.tenant = tenant;
+
+  console.log(req.tenant, 'REQ.TENANT DEL MIDDLEWARE');
+  
   next();
 };
 
