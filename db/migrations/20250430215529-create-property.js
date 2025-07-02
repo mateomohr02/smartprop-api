@@ -22,16 +22,18 @@ module.exports = {
         allowNull: false,
       },
       priceFIAT: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM('ARS', 'USD', 'BRL', 'EUR'),
         allowNull: false,
       },
       expenses: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        defaultValue: 0
       },
       expensesFIAT: {
-        type: Sequelize.STRING,
+        type: Sequelize.ENUM('ARS', 'USD', 'BRL', 'EUR'),
         allowNull: false,
+        defaultValue: 'ARS'
       },
       financing: {
         type: Sequelize.STRING,
@@ -174,6 +176,8 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable("Properties");
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_priceFIAT";');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_expensesFIAT";');
     await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_operation";');
     await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_condition";');
     await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_availabilityType";');

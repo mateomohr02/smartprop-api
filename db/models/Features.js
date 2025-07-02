@@ -73,7 +73,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE'
       },
     },
-    {}
+    { timestamps: true }
   );
 
   return Features;

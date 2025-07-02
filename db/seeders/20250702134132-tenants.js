@@ -5,7 +5,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     return queryInterface.bulkInsert("Tenants", [
     { 
-      id: '2fcee51c-7879-4682-92c2-033e72fe129f',
+      id: '2b9db4e2-b729-4de1-aef5-a6cfcc391cb0',
       name: "Inmobiliaria Mohr",
       email: "inmomohr@gmail.com",
       domain: "inmomohr.com.ar",

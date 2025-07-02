@@ -23,16 +23,18 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       priceFIAT: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('ARS', 'USD', 'EUR', 'BRL'),
         allowNull: false,
       },
       expenses: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        defaultValue: 0
       },
       expensesFIAT: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('ARS', 'USD', 'BRL', 'EUR'),
         allowNull: false,
+        defaultValue: 'ARS'
       },
       financing: {
         type: DataTypes.STRING,
@@ -148,17 +150,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
         onDelete: "CASCADE",
-      },
-      createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-      },
+      }
     },
-    {}
+    { timestamps: true }
   );
 
   return Property;

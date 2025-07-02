@@ -24,8 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       onDelete: 'CASCADE'
     },
-  }, {
-  });
+  }, { timestamps: true });
 
   return PropertyType; 
 };

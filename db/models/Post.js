@@ -61,17 +61,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
         onDelete: "CASCADE",
-      },
-      createdAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-      },
-      updatedAt: {
-        allowNull: false,
-        type: DataTypes.DATE,
-      },
+      }
     },
-    {}
+    { timestamps: true }
   );
 
   return Post;
