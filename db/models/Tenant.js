@@ -15,8 +15,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull:false
     },
-    googleManagementSystempId: DataTypes.STRING,
     googleTagManagerId: DataTypes.STRING,
+    googleAnalyticsId: DataTypes.STRING,
+    googleAdsId: DataTypes.STRING,
+    tikTokPixelId:DataTypes.STRING,
     metaPixelId: DataTypes.STRING,
     isInternational: {
       type: DataTypes.BOOLEAN,

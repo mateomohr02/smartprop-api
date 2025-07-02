@@ -17,10 +17,16 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      googleManagementSystempId: {
+      googleAnalyticsId: {
+        type: Sequelize.STRING
+      },
+      googleAdsId: {
         type: Sequelize.STRING
       },
       googleTagManagerId: {
+        type: Sequelize.STRING
+      },
+      tikTokPixelId: {
         type: Sequelize.STRING
       },
       metaPixelId: {
