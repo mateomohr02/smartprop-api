@@ -40,6 +40,10 @@ const findTenant = async (id) => {
 };
 
 const setInactiveTenant = async ({ tenantId, userId, tenantIdParams }) => {
+
+console.log(tenantId, userId, tenantIdParams, 'DATA');
+
+
   if (!tenantId || !userId) {
     throw new AppError("Missing required data: tenantId or userId", 400);
   }
@@ -67,8 +71,34 @@ const setInactiveTenant = async ({ tenantId, userId, tenantIdParams }) => {
   return tenant;
 };
 
+const updateMetricsIds = async (tenantId, { googleManagementSystemId, googleTagManagerId, metaPixelId }) => {
+  
+  const tenant = await Tenant.findByPk(tenantId);
+
+  if (!tenant) {
+    throw new AppError("Tenant not found", 404);
+  }
+
+  if (googleManagementSystemId !== undefined) {
+    tenant.googleManagementSystemId = googleManagementSystemId;
+  }
+
+  if (googleTagManagerId !== undefined) {
+    tenant.googleTagManagerId = googleTagManagerId;
+  }
+
+  if (metaPixelId !== undefined) {
+    tenant.metaPixelId = metaPixelId;
+  }
+
+  await tenant.save();
+
+  return tenant;
+};
+
 module.exports = {
   addTenant,
   findTenant,
   setInactiveTenant,
+  updateMetricsIds
 };

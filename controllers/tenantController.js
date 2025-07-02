@@ -1,4 +1,4 @@
-const { addTenant, findTenant, setInactiveTenant } = require("../services/tenant/tenant.service");
+const { addTenant, findTenant, setInactiveTenant, updateMetricsIds } = require("../services/tenant/tenant.service");
 const { addUser } = require("../services/user/user.service");
 const catchAsync = require("../utils/catchAsync");
 
@@ -26,7 +26,7 @@ const findTenantById = catchAsync(async (req, res, next) => {
 
 const setInactive = catchAsync(async (req, res, next) => {
   const { tenantIdParams } = req.params;
-  const { tenantId } = req.tenant;
+  const tenantId = req.tenant.id;
   const userId = req.user.id;
 
   const updatedTenant = await setInactiveTenant({ tenantId, userId, tenantIdParams });
@@ -38,8 +38,28 @@ const setInactive = catchAsync(async (req, res, next) => {
   });
 });
 
+const addMetricsID = catchAsync(async (req, res, next) => {
+
+  const { googleManagementSystemId, googleTagManagerId, metaPixelId } = req.body;
+  const tenantId = req.tenant.id;
+
+  const updatedTenant = await updateMetricsIds(tenantId, {
+    googleManagementSystemId,
+    googleTagManagerId,
+    metaPixelId,
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "Metrics IDs updated successfully",
+    data: updatedTenant,
+  });
+
+})
+
 module.exports = {
   createTenant,
   findTenantById,
-  setInactive
+  setInactive,
+  addMetricsID
 };
