@@ -25,7 +25,7 @@ const registerUser = async ({ name, email, password }) => {
 };
 
 const loginUser = async ({ email, password }, tenantId) => {
-  
+
   if (!email || !password) {
     throw new AppError("Please provide email and password", 400);
   }
@@ -36,7 +36,7 @@ const loginUser = async ({ email, password }, tenantId) => {
     throw new AppError("Incorrect Credentials", 401);
   }
 
-  const passwordMatch = bcrypt.compare(password, user.password);
+  const passwordMatch = await bcrypt.compare(password, user.password);
 
   if (!passwordMatch) {
     throw new AppError("Incorrect Password", 401);

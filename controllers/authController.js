@@ -23,10 +23,13 @@ const signUp = catchAsync(async (req, res, next) => {
 
 // Controlador para /login
 const login = catchAsync(async (req, res, next) => {
+  const tenant = req.tenant;
 
-  const tenantId = req.tenant.id
+  if (!tenant.active) {
+    throw new AppError("Client deactivated. Please contact sales.", 403);
+  }
 
-  const { token } = await loginUser(req.body, tenantId);
+  const { token } = await loginUser(req.body, tenant.id);
 
   res.status(200).json({
     status: "success",

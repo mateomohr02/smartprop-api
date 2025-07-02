@@ -1,46 +1,54 @@
-const { Tenant } = require("../../db/models")
+const { Tenant } = require("../../db/models");
 const AppError = require("../../utils/appError");
 const { validateEmail } = require("../auth/auth.helpers");
 
-const addTenant = async ( { name, email, domain } ) => {
-    if(!name || !email || !domain) {
-        throw new AppError("Missing parameters to create a Tenant", 400);
-    }
+const addTenant = async ({ name, email, domain }) => {
+  if (!name || !email || !domain) {
+    throw new AppError("Missing parameters to create a Tenant", 400);
+  }
 
-    if (!validateEmail(email)) {
-        throw new AppError("Invalid email format.", 400);
-    }
+  if (!validateEmail(email)) {
+    throw new AppError("Invalid email format.", 400);
+  }
 
-    const tenantExists = await Tenant.findOne({ where: { email }});
+  const tenantExists = await Tenant.findOne({ where: { email } });
 
-    if (tenantExists) {
-        throw new AppError(`There is a Tenant already registered with email: ${email}`, 409);
+  if (tenantExists) {
+    throw new AppError(
+      `There is a Tenant already registered with email: ${email}`,
+      409
+    );
+  }
 
-    }
+  const newTenant = await Tenant.create({ name, email, domain });
 
-    const newTenant = await Tenant.create( { name, email, domain } );
+  return newTenant;
+};
 
-    return newTenant
-}
+const findTenant = async (id) => {
+  if (!id) {
+    throw new AppError("Missing id to find Tenant", 400);
+  }
 
-const findTenant = async ( id ) => {
-    
-    if(!id) {
-        throw new AppError("Missing id to find Tenant", 400);
-    }
+  const tenant = await Tenant.findByPk(id);
 
-    const tenant = await Tenant.findByPk(id);
+  if (!tenant) {
+    throw new AppError(`Tenant not found id: ${id}`, 409);
+  }
 
-    if (!tenant) {
-        throw new AppError(`Tenant not found id: ${id}`, 409);
-    }
-
-    return tenant;
-}
+  return tenant;
+};
 
 const setInactiveTenant = async ({ tenantId, userId, tenantIdParams }) => {
-  if (!tenantId || !userId || (tenantId !== tenantIdParams)) {
-    throw new AppError("Missing or wrong data provided", 400);
+  if (!tenantId || !userId) {
+    throw new AppError("Missing required data: tenantId or userId", 400);
+  }
+
+  if (tenantId !== tenantIdParams) {
+    throw new AppError(
+      `Tenant mismatch: Authenticated tenantId (${tenantId}) does not match param (${tenantIdParams})`,
+      403
+    );
   }
 
   const tenant = await Tenant.findByPk(tenantId);
@@ -62,5 +70,5 @@ const setInactiveTenant = async ({ tenantId, userId, tenantIdParams }) => {
 module.exports = {
   addTenant,
   findTenant,
-  setInactiveTenant
-}
+  setInactiveTenant,
+};

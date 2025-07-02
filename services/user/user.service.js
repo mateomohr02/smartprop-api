@@ -79,10 +79,6 @@ const fetchUsersByTenantId = async (id) =>{
 
   const users = await User.findAll({ where : { tenantId: id } });
 
-  if (!users) {
-    throw new AppError(`No User records for the Client ID: ${id}`, 400);
-  }
-
   return users;
 
 }

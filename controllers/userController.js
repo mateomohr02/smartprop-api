@@ -1,48 +1,24 @@
 
 const { addUser, fetchUsersByTenantId, removeUser } = require("../services/user/user.service");
 const AppError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
-const getUsersTenant = async (req, res) => {
-  try {
+const getUsersTenant = catchAsync(async (req, res) => {
+  const users = await fetchUsersByTenantId(req.tenant.id);
+  res.status(200).json({ status: "success", data: users });
+});
 
-    const users = await fetchUsersByTenantId(req.tenant.id);
+const createUser = catchAsync(async (req, res) => {
+  const newUser = await addUser(req.body, null, req);
+  res.status(201).json({ status: "success", data: newUser });
+});
 
-    res.status(201).json({
-      status: "success",
-      data: users,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const deleteUser = catchAsync(async (req, res) => {
+  const { toDeleteUserId } = req.params;
+  await removeUser(req.tenant.id, req.user.id, toDeleteUserId);
+  res.status(200).json({ status: "success", message: "User deleted successfully" });
+});
 
-const createUser = async (req, res) => {
-  try {
-    const newUser = await addUser(req.body, null, req);
-
-    res.status(201).json({
-      status: "success",
-      data: newUser,
-    });
-  } catch (error) {
-    next(error); 
-  }
-};
-const deleteUser = async (req, res, next) => {
-  try {
-    const { toDeleteUserId } = req.params;
-
-    await removeUser(req.tenant.id, req.user.id, toDeleteUserId);
-
-    res.status(200).json({
-      status: "success",
-      message: "User deleted successfully"
-    });
-
-  } catch (error) {
-    next(error); 
-  }
-};
 
 
 module.exports = {

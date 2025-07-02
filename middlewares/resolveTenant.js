@@ -14,7 +14,7 @@ const resolveTenant = async (req, res, next) => {
   if (!tenant) {
     return next(new AppError("Tenant not found", 404));
   }
-
+  
   req.tenant = tenant;
   next();
 };
