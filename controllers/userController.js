@@ -1,24 +1,35 @@
-const { addUser } = require("../services/user/user.service");
+
+const { addUser, fetchUsersByTenantId  } = require("../services/user/user.service");
+const AppError = require("../utils/appError");
 
 const getUsersTenant = async (req, res) => {
-  
-}
-
-const createUser = async (req, res, next) => {
   try {
-    const newUser = await addUser(req.body, null, req); 
+
+    const users = await fetchUsersByTenantId(req.tenant.id);
 
     res.status(201).json({
       status: "success",
-      message: "User created",
+      data: users,
+    });
+  } catch (error) {
+    throw new AppError(error, 401);
+  }
+};
+
+const createUser = async (req, res) => {
+  try {
+    const newUser = await addUser(req.body, null, req);
+
+    res.status(201).json({
+      status: "success",
       data: newUser,
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    throw new AppErrorError(error, 401);
   }
 };
 
 module.exports = {
-  createUser
+  createUser,
+  getUsersTenant
 };
-

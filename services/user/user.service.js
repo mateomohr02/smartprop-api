@@ -29,7 +29,7 @@ const addUser = async (
     throw new AppError("Invalid email format.", 400);
   }
 
-  const userExists = await User.findOne({ where: { email, tenantId } });
+  const userExists = await User.findOne({ where : { email, tenantId } });
 
   if (userExists) {
     throw new AppError(
@@ -53,6 +53,24 @@ const addUser = async (
   return newUser;
 };
 
+const fetchUsersByTenantId = async (id) =>{
+
+
+  if (!id) {
+    throw new AppError("For this Action you need the Client ID");
+  }
+
+  const users = await User.findAll({ where : { tenantId: id } });
+
+  if (!users) {
+    throw new AppError(`No User records for the Client ID: ${id}`, 400);
+  }
+
+  return users;
+
+}
+
 module.exports = {
   addUser,
+  fetchUsersByTenantId
 };
