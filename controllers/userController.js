@@ -1,5 +1,5 @@
 
-const { addUser, fetchUsersByTenantId  } = require("../services/user/user.service");
+const { addUser, fetchUsersByTenantId, removeUser } = require("../services/user/user.service");
 const AppError = require("../utils/appError");
 
 const getUsersTenant = async (req, res) => {
@@ -12,7 +12,7 @@ const getUsersTenant = async (req, res) => {
       data: users,
     });
   } catch (error) {
-    throw new AppError(error, 401);
+    next(error);
   }
 };
 
@@ -25,11 +25,28 @@ const createUser = async (req, res) => {
       data: newUser,
     });
   } catch (error) {
-    throw new AppErrorError(error, 401);
+    next(error); 
+  }
+};
+const deleteUser = async (req, res, next) => {
+  try {
+    const { toDeleteUserId } = req.params;
+
+    await removeUser(req.tenant.id, req.user.id, toDeleteUserId);
+
+    res.status(200).json({
+      status: "success",
+      message: "User deleted successfully"
+    });
+
+  } catch (error) {
+    next(error); 
   }
 };
 
+
 module.exports = {
   createUser,
-  getUsersTenant
+  getUsersTenant,
+  deleteUser
 };

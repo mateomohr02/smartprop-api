@@ -14,7 +14,8 @@ const addTenant = async ( { name, email, domain } ) => {
     const tenantExists = await Tenant.findOne({ where: { email }});
 
     if (tenantExists) {
-        throw new AppError(`There is a Tenant with the same email: ${tenantExists}`, 409);
+        throw new AppError(`There is a Tenant already registered with email: ${email}`, 409);
+
     }
 
     const newTenant = await Tenant.create( { name, email, domain } );
@@ -37,7 +38,29 @@ const findTenant = async ( id ) => {
     return tenant;
 }
 
+const setInactiveTenant = async ({ tenantId, userId, tenantIdParams }) => {
+  if (!tenantId || !userId || (tenantId !== tenantIdParams)) {
+    throw new AppError("Missing or wrong data provided", 400);
+  }
+
+  const tenant = await Tenant.findByPk(tenantId);
+
+  if (!tenant) {
+    throw new AppError("Tenant not found", 404);
+  }
+
+  if (!tenant.active) {
+    throw new AppError("Tenant is already inactive", 400);
+  }
+
+  tenant.active = false;
+  await tenant.save();
+
+  return tenant;
+};
+
 module.exports = {
   addTenant,
-  findTenant
+  findTenant,
+  setInactiveTenant
 }

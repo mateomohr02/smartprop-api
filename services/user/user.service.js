@@ -3,6 +3,23 @@ const AppError = require("../../utils/appError");
 const { validateEmail } = require("../auth/auth.helpers");
 const bcrypt = require("bcryptjs");
 
+const removeUser = async (tenantId, userId, toDeleteUserId) => {
+  if (!tenantId || !userId) {
+    throw new AppError("Missing tenant or user credentials", 400);
+  }
+
+  const user = await User.findOne({
+    where: { id: toDeleteUserId, tenantId }
+  });
+
+  if (!user) {
+    throw new AppError(`User not found for tenant ID: ${tenantId}`, 404);
+  }
+
+  await user.destroy();
+  return true;
+};
+
 const addUser = async (
   { name, email, password },
   tenantFromCtx = null,
@@ -72,5 +89,6 @@ const fetchUsersByTenantId = async (id) =>{
 
 module.exports = {
   addUser,
-  fetchUsersByTenantId
+  fetchUsersByTenantId,
+  removeUser
 };

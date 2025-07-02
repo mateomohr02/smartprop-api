@@ -1,11 +1,9 @@
-const { addTenant, findTenant } = require("../services/tenant/tenant.service");
+const { addTenant, findTenant, setInactiveTenant } = require("../services/tenant/tenant.service");
 const { addUser } = require("../services/user/user.service");
 
 const createTenant = async (req, res, next) => {
 
   const tenant = await addTenant(req.body.tenant);
-
-  console.log(tenant, 'TENANT CREATE TENANT');
 
   const firstUser = await addUser(req.body.user, tenant);
 
@@ -28,7 +26,22 @@ const findTenantById = async (req, res, next) => {
   });
 };
 
+const setInactive = async (req, res, next) => {
+  const { tenantIdParams } = req.params
+  const { tenantId } = req.tenant;  
+  const userId = req.user.id;  
+
+  const updatedTenant = await setInactiveTenant({ tenantId, userId, tenantIdParams });
+
+  res.status(200).json({
+    status: "success",
+    message: "Tenant set as inactive",
+    data: true,
+  });
+};
+
 module.exports = {
   createTenant,
   findTenantById,
+  setInactive
 };
