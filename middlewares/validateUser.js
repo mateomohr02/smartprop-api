@@ -15,11 +15,19 @@ const validateUser = async (req, res, next) => {
     if (!token) {
       throw new AppError("Token not provided", 401);
     }
+    
+    console.log(token, 'SESSION TOKEN');
+    
 
     const decoded = verifyToken(token);
 
+    console.log(decoded, 'DECODED MIDDLEWARE');
+
     const tenant = await Tenant.findByPk(req.tenant.id);
     const user = await User.findByPk(decoded.id);
+
+    console.log(tenant, user, 'FOUND');
+    
 
     if (!user || !tenant || !user.isValidated || user.tenantId !== tenant.id) {
       throw new AppError("User validation failed.", 401);

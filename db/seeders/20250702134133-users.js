@@ -7,7 +7,7 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     return queryInterface.bulkInsert("Users", [
     { 
-      id: uuidv4(),
+      id: "d1f0a6fc-6a30-415a-8293-ab832b9e2c62",
       email:"mohr.mateo@gmail.com",
       name:"Mateo Mohr",
       password: "$2b$05$AXb643zKTEPv4m2bvpbkHeAg0AcLlrzuCd.xU6Cw7NNKIw5CISih.",
@@ -17,7 +17,7 @@ module.exports = {
       updatedAt: new Date()
     },
     { 
-      id: uuidv4(),
+      id: "1803d222-1c1b-4664-9ee7-94b3e5f70fad",
       email:"mohr.mateo1@gmail.com",
       name:"Mateo Mohr 1",
       password: "$2b$05$AXb643zKTEPv4m2bvpbkHeAg0AcLlrzuCd.xU6Cw7NNKIw5CISih.",
@@ -27,7 +27,7 @@ module.exports = {
       updatedAt: new Date()
     },
     { 
-      id: uuidv4(),
+      id: "019cfefa-043f-48f8-9e4e-9d643a386b68",
       email:"mohr.mateo2@gmail.com",
       name:"Mateo Mohr 2",
       password: "$2b$05$AXb643zKTEPv4m2bvpbkHeAg0AcLlrzuCd.xU6Cw7NNKIw5CISih.",
@@ -37,7 +37,7 @@ module.exports = {
       updatedAt: new Date()
     },
    { 
-      id: uuidv4(),
+      id: "8b398bb5-00c3-4cbb-969a-7287194c45c6",
       email:"mohr.mateo3@gmail.com",
       name:"Mateo Mohr 3",
       password: "$2b$05$AXb643zKTEPv4m2bvpbkHeAg0AcLlrzuCd.xU6Cw7NNKIw5CISih.",

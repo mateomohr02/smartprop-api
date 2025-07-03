@@ -1,4 +1,11 @@
-const { Property, Features, PropertyType, City, Neighborhood } = require("../../db/models");
+const {
+  Property,
+  Features,
+  PropertyType,
+  City,
+  Neighborhood,
+  User
+} = require("../../db/models");
 const AppError = require("../../utils/appError");
 const { nameFormatter, slugFormatter } = require("../../utils/stringFormatter");
 const { fetchandCreateCharacteristics } = require("./characteristic.service");
@@ -59,8 +66,6 @@ const addProperty = async (
     tenantId
   );
   //Example = CharacteristicsIds = ['1', '2', '4', '3']
-  console.log(characteristicsIds, "CharacteristicsIds");
-
   //Example: PropertyType = "casa":slug
   //         PropertyType = "casa quinta":name : nuevoRegistro
   //         Se guarda como: "Casa Quinta" retorna id del nuevo registro
@@ -69,8 +74,6 @@ const addProperty = async (
     tenantId
   );
   //Example = PropertyTypeId = 1
-  console.log(propertyTypeId, "PropertyTypeId");
-
   if (!characteristicsIds.length || !propertyTypeId) {
     throw new AppError(
       "Error while trying to add Characteristics or the Property Type",
@@ -126,8 +129,6 @@ const addProperty = async (
     throw new AppError("Error while creating the property", 404);
   }
 
-  console.log(newProp, "NEW PROP");
-
   //CREAMOS EL DATO DE LOS AMBIENTES DE LA PROPIEDAD
   //FEATURE:
   //rooms N
@@ -144,14 +145,10 @@ const addProperty = async (
 
   const featureProp = await createFeature(features, newProp.id, tenantId);
 
-  console.log(featureProp, "Feature Prop");
-
   return { newProp, featureProp };
 };
 
 const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
-  console.log("DATA INCOMING SERVICE", limit, page, offset, tenantId);
-
   if (
     [limit, page, offset].some((val) => typeof val !== "number") ||
     !tenantId
@@ -162,11 +159,10 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
     );
   }
 
-  console.log("DATA INCOMING SERVICE", limit, page, offset, tenantId);
-
   const props = await Property.findAndCountAll({
     where: {
       tenantId,
+      isActive: true
     },
     limit,
     offset,
@@ -205,7 +201,43 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
   return props;
 };
 
+const toggleIsActiveProperty = async (propertyId, tenantId, userId) => {
+  if (!propertyId || !tenantId || !userId) {
+    throw new AppError("Missing parameters.", 400);
+  }
+
+  const property = await Property.findOne({
+    where: {
+      id: propertyId,
+      tenantId,
+    },
+  });
+
+  if (!property) {
+    throw new AppError("Property Not Found.", 404);
+  }
+
+  const user = await User.findOne({
+    where: {
+      id:userId,
+      tenantId
+    }
+  })
+
+  if (!user || !user.isValidated) {
+    throw new AppError("User not found or unalowed.", 403);
+  }
+
+  property.isActive = !property.isActive;
+
+  await property.save();
+
+  return property;
+
+};
+
 module.exports = {
   addProperty,
   fetchPropertiesTenantId,
+  toggleIsActiveProperty,
 };

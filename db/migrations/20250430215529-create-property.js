@@ -125,6 +125,11 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",
       },
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
       neighborhoodId: {
         type: Sequelize.UUID,
         allowNull: false,

@@ -118,6 +118,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
       },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
       neighborhoodId: {
         type: DataTypes.UUID,
         references: {
