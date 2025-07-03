@@ -33,6 +33,11 @@ const setIsActiveProperty = catchAsync(async (req, res) => {
   res.status(200).json({ status: "success", data: property });
 })
 
+const getCatalogue = catchAsync( async (req, res) => {
+    const {filter} = req.body;
+    
+})
+
 module.exports = {
     createProperty,
     getPropertiesTenant,

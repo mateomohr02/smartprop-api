@@ -1,8 +1,10 @@
 "use strict";
 
 module.exports = (sequelize, DataTypes) => {
-  const Features = sequelize.define(
-    "Features",
+  const PropertyRooms = sequelize.define(
+    "PropertyRooms",
+
+    //ESTE MODELO ALMACENA LOS DATOS DE LA COMPOSICIÓN DEL INMUEBLE
     {
       id: {
         type: DataTypes.UUID,
@@ -12,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       propertyId: {
         type: DataTypes.UUID,
-        allownull: false,
+        allowNull: false,
         references: {
-          model: "property",
+          model: "Properties",
           key: "id",
         },
         onDelete: 'CASCADE'
@@ -25,30 +27,35 @@ module.exports = (sequelize, DataTypes) => {
       },
       bedrooms: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        allowNull: true,
+        defaultValue: null
       },
       bathrooms: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      toilettes: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
+        allowNull: true,
+        defaultValue: null
       },
       garage: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      balcony: {
-        type: DataTypes.FLOAT,
         allowNull: true,
+        defaultValue: null
       },
-      meetingsRoom: {
+      toilette: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      pool: {
+      balcony: {
+        //Almacena mts2 del balcón
+        type: DataTypes.FLOAT,
+        allowNull: true,
+        defaultValue: null
+      },
+      garden: {
         type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      livingRoom: {
+        type:DataTypes.BOOLEAN,
         defaultValue: false,
       },
       laundryRoom: {
@@ -66,7 +73,7 @@ module.exports = (sequelize, DataTypes) => {
       tenantId: {
         type: DataTypes.UUID,
         references: {
-          model: "tenant",
+          model: "Tenants",
           key: "id",
         },
         allowNull: false,
@@ -76,5 +83,5 @@ module.exports = (sequelize, DataTypes) => {
     { timestamps: true }
   );
 
-  return Features;
+  return PropertyRooms;
 };

@@ -11,50 +11,26 @@ const { nameFormatter, slugFormatter } = require("../../utils/stringFormatter");
 const { fetchandCreateCharacteristics } = require("./characteristic.service");
 const { fetchOrCreatePropertyType } = require("./propertyType.service");
 const { fetchOrCreatePlace } = require("../places/places.service");
-const { createFeature } = require("./feature.service");
+const { addPropertyRooms } = require("./propertyRooms.service");
+const { addPropertyComodities } = require("./proppertyComodities.service");
 
 const addProperty = async (
   {
-    title,
-    price,
-    priceFIAT,
-    expenses,
-    expensesFIAT,
-    financing,
-    operation,
-    propertyType,
-    address,
-    mapLocation,
-    description,
-    multimedia,
-    surface,
-    condition,
-    age,
-    availabilityType,
-    availabilityDate,
-    place,
-    characteristics,
-    features,
+    title, price, priceFIAT, expenses, expensesFIAT, financing,
+    operation, propertyType, address, mapLocation, description,
+    multimedia, surface, condition, age, availabilityType, services,
+    availabilityDate, place, characteristics, propertyRooms, propertyComodities
   },
   tenantId
 ) => {
   if (
-    !characteristics ||
-    !features ||
-    !propertyType ||
-    !title ||
-    !price ||
-    !priceFIAT ||
-    !operation ||
-    !address ||
-    !mapLocation ||
-    !description ||
-    !multimedia ||
+    !characteristics || !propertyComodities || !propertyRooms || !propertyType ||
+    !title ||  !description || !address || !mapLocation ||  !multimedia || !place ||
+    !priceFIAT || !price || 
+    !operation ||   
     !surface ||
-    !condition ||
-    !age ||
+    !condition || !age ||
     !availabilityType ||
-    !place ||
     !tenantId
   ) {
     throw new AppError("Missing parameters to create a Property", 400);
@@ -73,6 +49,7 @@ const addProperty = async (
     propertyType,
     tenantId
   );
+
   //Example = PropertyTypeId = 1
   if (!characteristicsIds.length || !propertyTypeId) {
     throw new AppError(
@@ -88,10 +65,12 @@ const addProperty = async (
   // cityInput: 'cordoba' ->slug
   // neighborhoodInput: 'URCA' ->name ingresado por el usuario
   //}
-  const { countryId, provinceId, cityId, neighborhoodId } =
+  const { countryId, provinceId, city, neighborhood } =
     await fetchOrCreatePlace(place);
 
   //Recibe IDs correpondientes
+
+  const propertySlug = slugFormatter(`${operation} ${title} ${propertyRooms.rooms} "ambientes" ${address} "en" ${city.name} ${neighborhood.name} ${price} ${priceFIAT} "publicado" ${new Date()}`)
 
   const formattedProppertyTitle = nameFormatter(title);
 
@@ -103,8 +82,8 @@ const addProperty = async (
     title: formattedProppertyTitle,
     price,
     priceFIAT,
+    slug: propertySlug,
     expenses,
-    slug: slugFormatter(title),
     expensesFIAT,
     financing: financingProp,
     operation,
@@ -116,12 +95,13 @@ const addProperty = async (
     surface,
     condition,
     age,
+    services,
     availabilityType,
     finalAvailabilityDate,
     countryId,
     provinceId,
-    cityId,
-    neighborhoodId,
+    cityId: city.id,
+    neighborhoodId: neighborhood.id,
     tenantId,
   });
 
@@ -143,9 +123,11 @@ const addProperty = async (
   //roofTop TERRAZA T/F
   //kitchen T/F
 
-  const featureProp = await createFeature(features, newProp.id, tenantId);
+  const addedPropertyRooms = await addPropertyRooms(propertyRooms, newProp.id, tenantId);
+  const addedPropertyComodities = await addPropertyComodities(propertyComodities, newProp.id, tenantId)
 
-  return { newProp, featureProp };
+
+  return { newProp, addedPropertyRooms, addPropertyComodities };
 };
 
 const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
@@ -161,8 +143,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
 
   const props = await Property.findAndCountAll({
     where: {
-      tenantId,
-      isActive: true
+      tenantId
     },
     limit,
     offset,

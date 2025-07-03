@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     provinceId:{
       type: DataTypes.UUID,
       references: {
-        model: "province",
+        model: "Provinces",
         key: "id"
       },
       allowNull: false

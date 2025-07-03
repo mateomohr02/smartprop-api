@@ -3,7 +3,13 @@ module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
     "Property",
     {
-      //LAS FEATURES SE GUARDAN COMO RELACIÓN 1:1
+      //Features almacena la información de los ambientes y tipos de ambientes de la propiedad
+      //PropertyComodities almacena la información de las comunidades del la propiedad.
+      //PropertyCharacteristics es la talba intermedia que almacena las referencias de las características de la propiedad.
+      //Characteristics son adjetivos que describen a la propiedad: "luminoso", "acepta mascotas", "amoblado", etc...
+      //PropertyType indica el tipo de Inmueble: "Casa", "Departamento,"PH", etc...
+
+      //DATOS IMPORTANTES
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -23,30 +29,30 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       priceFIAT: {
-        type: DataTypes.ENUM('ARS', 'USD', 'EUR', 'BRL'),
+        type: DataTypes.ENUM("ARS", "USD", "EUR", "BRL"),
         allowNull: false,
       },
       expenses: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 0
+        defaultValue: 0,
       },
       expensesFIAT: {
-        type: DataTypes.ENUM('ARS', 'USD', 'BRL', 'EUR'),
+        type: DataTypes.ENUM("ARS", "USD", "BRL", "EUR"),
         allowNull: false,
-        defaultValue: 'ARS'
-      },
-      financing: {
-        type: DataTypes.STRING,
+        defaultValue: "ARS",
       },
       operation: {
         type: DataTypes.ENUM("sale", "rent", "short-term"),
         allowNull: false,
       },
+      financing: {
+        type: DataTypes.STRING,
+      },
       propertyTypeId: {
         type: DataTypes.UUID,
         references: {
-          model: "propertyType",
+          model: "PropertyTypes",
           key: "id",
         },
         allowNull: false,
@@ -70,29 +76,6 @@ module.exports = (sequelize, DataTypes) => {
       multimedia: {
         type: DataTypes.JSONB,
         allowNull: false,
-      },
-      surface: {
-        type: DataTypes.JSONB,
-        allowNull: false,
-        defaultValue: {
-          covered: "",
-          total: "",
-        },
-      },
-      condition: {
-        type: DataTypes.ENUM("new", "like-new", "good", "to-renovate"),
-        allowNull: false,
-      },
-      age: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      availabilityType: {
-        type: DataTypes.ENUM("inmediate", "date"),
-        allowNull: false,
-      },
-      availabilityDate: {
-        type: DataTypes.DATE,
       },
       countryId: {
         type: DataTypes.UUID,
@@ -118,11 +101,6 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
       },
-      isActive: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true
-      },
       neighborhoodId: {
         type: DataTypes.UUID,
         references: {
@@ -131,6 +109,49 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
       },
+
+      //DATOS DESCRIPTIVOS
+      surface: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: {
+          covered: "",
+          total: "",
+        },
+      },
+      services: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: {
+          light: true,
+          water: true,
+          gas: true,
+        },
+      },
+      condition: {
+        type: DataTypes.ENUM("new", "like-new", "good", "to-renovate"),
+        allowNull: false,
+      },
+      age: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      availabilityType: {
+        type: DataTypes.ENUM("inmediate", "date"),
+        allowNull: false,
+      },
+      availabilityDate: {
+        type: DataTypes.DATE,
+        defaultValue: new Date()
+      },
+
+      //MÉTRICAS / MUESTRA AL PÚBLICO
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
+
       isFeatured: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -147,6 +168,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+
+      //PROPIETARIO
       tenantId: {
         type: DataTypes.UUID,
         references: {
@@ -155,7 +178,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
         onDelete: "CASCADE",
-      }
+      },
     },
     { timestamps: true }
   );

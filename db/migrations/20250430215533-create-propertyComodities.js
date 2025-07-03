@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("Features", {
+    await queryInterface.createTable("PropertyComodities", {
       id: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -19,29 +19,9 @@ module.exports = {
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
-      rooms: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      bedrooms: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      bathrooms: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      toilettes: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      garage: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      balcony: {
-        type: Sequelize.FLOAT,
-        allowNull: true,
+      grill: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       meetingsRoom: {
         type: Sequelize.BOOLEAN,
@@ -51,15 +31,23 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      laundryRoom: {
+      laundry: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      roofTop: {
+      gym: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
-      kitchen: {
+      elevator: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      gazebo: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
+      caretaker: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
@@ -87,6 +75,6 @@ module.exports = {
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable("Features");
+    await queryInterface.dropTable("PropertyComodities");
   },
 };

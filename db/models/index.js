@@ -49,9 +49,13 @@ db.PropertyType.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 db.Tenant.hasMany(db.Characteristic, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
 db.Characteristic.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 
-// Tenant → Features
-db.Tenant.hasMany(db.Features, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
-db.Features.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
+// Tenant → PropertyRooms
+db.Tenant.hasMany(db.PropertyRooms, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
+db.PropertyRooms.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
+
+// Tenant → PropertyComities
+db.Tenant.hasMany(db.PropertyComodities, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
+db.PropertyComodities.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 
 // Tenant → PropertyCharacteristic
 db.Tenant.hasMany(db.PropertyCharacteristic, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
@@ -61,9 +65,13 @@ db.PropertyCharacteristic.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 db.PropertyType.hasMany(db.Property, { foreignKey: 'propertyTypeId' });
 db.Property.belongsTo(db.PropertyType, { foreignKey: 'propertyTypeId' });
 
-// Property → Features (1:1)
-db.Property.hasOne(db.Features, { foreignKey: 'propertyId', onDelete: 'CASCADE' });
-db.Features.belongsTo(db.Property, { foreignKey: 'propertyId' });
+// Property → PropertyRooms (1:1)
+db.Property.hasOne(db.PropertyRooms, { foreignKey: 'propertyId', onDelete: 'CASCADE' });
+db.PropertyRooms.belongsTo(db.Property, { foreignKey: 'propertyId' });
+
+// Property → PropertyComodities (1:1)
+db.Property.hasOne(db.PropertyComodities, { foreignKey: 'propertyId', onDelete: 'CASCADE' });
+db.PropertyComodities.belongsTo(db.Property, { foreignKey: 'propertyId' });
 
 // Property ↔ Characteristic (N:M) via PropertyCharacteristic
 db.Property.belongsToMany(db.Characteristic, {

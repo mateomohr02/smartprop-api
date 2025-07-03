@@ -35,12 +35,12 @@ module.exports = {
         allowNull: false,
         defaultValue: 'ARS'
       },
-      financing: {
-        type: Sequelize.STRING,
-      },
       operation: {
         type: Sequelize.ENUM("sale", "rent", "short-term"),
         allowNull: false,
+      },
+      financing: {
+        type: Sequelize.STRING,
       },
       propertyTypeId: {
         type: Sequelize.UUID,
@@ -72,29 +72,6 @@ module.exports = {
         type: Sequelize.JSONB,
         allowNull: false,
       },
-      surface: {
-        type: Sequelize.JSONB,
-        allowNull: false,
-        defaultValue: {
-          covered: "",
-          total: "",
-        },
-      },
-      condition: {
-        type: Sequelize.ENUM("new", "like-new", "good", "to-renovate"),
-        allowNull: false,
-      },
-      age: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      availabilityType: {
-        type: Sequelize.ENUM("inmediate", "date"),
-        allowNull: false,
-      },
-      availabilityDate: {
-        type: Sequelize.DATE,
-      },
       countryId: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -125,11 +102,6 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",
       },
-      isActive: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: true
-      },
       neighborhoodId: {
         type: Sequelize.UUID,
         allowNull: false,
@@ -140,6 +112,46 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",
       },
+      surface: {
+        type: Sequelize.JSONB,
+        allowNull: false,
+        defaultValue: {
+          covered: "",
+          total: "",
+        },
+      },
+      services: {
+        type: Sequelize.JSONB,
+        allowNull:false,
+       defaultValue: {
+        light: true,
+        water: true,
+        gas: true
+       }
+      },
+      condition: {
+        type: Sequelize.ENUM("new", "like-new", "good", "to-renovate"),
+        allowNull: false,
+      },
+      age: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      availabilityType: {
+        type: Sequelize.ENUM("inmediate", "date"),
+        allowNull: false,
+      },
+      availabilityDate: {
+        type: Sequelize.DATE,
+        defaultValue: new Date()
+      },
+      
+      isActive: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+      },
+      
       isFeatured: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

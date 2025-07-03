@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: 'tenant',
+        model: 'Tenants',
         key: 'id'
       },
       onDelete: 'CASCADE'

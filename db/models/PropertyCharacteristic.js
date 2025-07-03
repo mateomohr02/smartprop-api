@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       propertyId: {
         type: DataTypes.UUID,
         references: {
-          model: "property",
+          model: "Properties",
           key: "id",
         },
         allowNull: false,
@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       characteristicId: {
         type: DataTypes.UUID,
         references: {
-          model: "characteristic",
+          model: "Characteristics",
           key: "id",
         },
         allowNull: false,
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       tenantId: {
         type: DataTypes.UUID,
         references: {
-          model: "tenant",
+          model: "Tenants",
           key: "id",
         },
         allowNull: false,

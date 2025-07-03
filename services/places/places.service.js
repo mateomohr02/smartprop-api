@@ -54,8 +54,8 @@ const fetchOrCreatePlace = async ({ countryInput, provinceInput, cityInput, neig
   return {
     countryId: country.id,
     provinceId: province.id,
-    cityId: city.id,
-    neighborhoodId: neighborhood.id
+    city: city,
+    neighborhood: neighborhood
   };
 };
 
