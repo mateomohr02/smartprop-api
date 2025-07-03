@@ -3,7 +3,7 @@ const { addProperty, fetchPropertiesTenantId, toggleIsActiveProperty } = require
 
 const createProperty = catchAsync(async (req,res,next) => {
 
-    const property = await addProperty(req.body, req.tenant.id)
+    const property = await addProperty(req.body, req.tenant)
 
     res.status(201).json({
     status: "success",

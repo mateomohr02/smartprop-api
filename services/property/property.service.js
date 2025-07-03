@@ -12,7 +12,10 @@ const { fetchandCreateCharacteristics } = require("./characteristic.service");
 const { fetchOrCreatePropertyType } = require("./propertyType.service");
 const { fetchOrCreatePlace } = require("../places/places.service");
 const { addPropertyRooms } = require("./propertyRooms.service");
-const { addPropertyComodities } = require("./proppertyComodities.service");
+const { addPropertyComodities } = require("./propertyComodities.service");
+const { nanoid } = require("nanoid");
+
+
 
 const addProperty = async (
   {
@@ -21,7 +24,7 @@ const addProperty = async (
     multimedia, surface, condition, age, availabilityType, services,
     availabilityDate, place, characteristics, propertyRooms, propertyComodities
   },
-  tenantId
+  tenant
 ) => {
   if (
     !characteristics || !propertyComodities || !propertyRooms || !propertyType ||
@@ -31,7 +34,7 @@ const addProperty = async (
     !surface ||
     !condition || !age ||
     !availabilityType ||
-    !tenantId
+    !tenant.id
   ) {
     throw new AppError("Missing parameters to create a Property", 400);
   }
@@ -39,7 +42,7 @@ const addProperty = async (
   //Example: Characteristics = [characteristic1Slug, characteristic2Slug, newCharacteristicName1, characteristic3Slug]
   const characteristicsIds = await fetchandCreateCharacteristics(
     characteristics,
-    tenantId
+    tenant.id
   );
   //Example = CharacteristicsIds = ['1', '2', '4', '3']
   //Example: PropertyType = "casa":slug
@@ -47,7 +50,7 @@ const addProperty = async (
   //         Se guarda como: "Casa Quinta" retorna id del nuevo registro
   const propertyTypeId = await fetchOrCreatePropertyType(
     propertyType,
-    tenantId
+    tenant.id
   );
 
   //Example = PropertyTypeId = 1
@@ -70,7 +73,9 @@ const addProperty = async (
 
   //Recibe IDs correpondientes
 
-  const propertySlug = slugFormatter(`${operation} ${title} ${propertyRooms.rooms} "ambientes" ${address} "en" ${city.name} ${neighborhood.name} ${price} ${priceFIAT} "publicado" ${new Date()}`)
+  const shortId = nanoid(6);
+
+  const propertySlug = slugFormatter(`${operation === 'sale' ? "venta" : operation === 'rent' ? 'alquiler' : 'short-term'} ${title} ${propertyRooms.rooms} "ambientes" ${address} "en" ${city.name} ${neighborhood.name} ${price} ${priceFIAT} ${tenant.name} ${shortId}`)
 
   const formattedProppertyTitle = nameFormatter(title);
 
@@ -102,7 +107,7 @@ const addProperty = async (
     provinceId,
     cityId: city.id,
     neighborhoodId: neighborhood.id,
-    tenantId,
+    tenantId: tenant.id,
   });
 
   if (!newProp) {
@@ -123,11 +128,11 @@ const addProperty = async (
   //roofTop TERRAZA T/F
   //kitchen T/F
 
-  const addedPropertyRooms = await addPropertyRooms(propertyRooms, newProp.id, tenantId);
-  const addedPropertyComodities = await addPropertyComodities(propertyComodities, newProp.id, tenantId)
+  const addedPropertyRooms = await addPropertyRooms(propertyRooms, newProp.id, tenant.id);
+  const addedPropertyComodities = await addPropertyComodities(propertyComodities, newProp.id, tenant.id)
 
 
-  return { newProp, addedPropertyRooms, addPropertyComodities };
+  return { newProp, addedPropertyRooms, addedPropertyComodities };
 };
 
 const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
@@ -143,7 +148,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
 
   const props = await Property.findAndCountAll({
     where: {
-      tenantId
+      tenantId:tenantId
     },
     limit,
     offset,
