@@ -3,10 +3,11 @@ module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
     "Property",
     {
-      //Features almacena la información de los ambientes y tipos de ambientes de la propiedad
-      //PropertyComodities almacena la información de las comunidades del la propiedad.
-      //PropertyCharacteristics es la talba intermedia que almacena las referencias de las características de la propiedad.
-      //Characteristics son adjetivos que describen a la propiedad: "luminoso", "acepta mascotas", "amoblado", etc...
+      //PropertyRoom tabla intermedia de los ambientes y tipos de ambientes de la propiedad
+      //PropertyComodity tabla intermedia de las comunidades del la propiedad.
+      //PropertyCharacteristic tabla intermedia que almacena las referencias de las características de la propiedad.
+      //Characteristic son adjetivos que describen a la propiedad: "luminoso", "acepta mascotas", "amoblado", etc...
+      //Room modelo que describe los tipos de habitaciones de la propiedad: "Quincho", "Living", "Comedor"
       //PropertyType indica el tipo de Inmueble: "Casa", "Departamento,"PH", etc...
 
       //DATOS IMPORTANTES

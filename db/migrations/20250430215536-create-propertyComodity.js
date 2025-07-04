@@ -19,37 +19,14 @@ module.exports = {
         onDelete: "CASCADE",
         onUpdate: "CASCADE",
       },
-      grill: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      meetingsRoom: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      pool: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      laundry: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      gym: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      elevator: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      gazebo: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-      },
-      caretaker: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
+      comodityId: {
+        type: Sequelize.UUID,
+        allownull: false,
+        references: {
+          model: "Comodities",
+          key: "id",
+        },
+        onDelete: 'CASCADE'
       },
       tenantId: {
         type: Sequelize.UUID,

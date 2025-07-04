@@ -1,6 +1,6 @@
 const {
   Property,
-  Features,
+  PropertyRooms,
   PropertyType,
   City,
   Neighborhood,
@@ -14,6 +14,7 @@ const { fetchOrCreatePlace } = require("../places/places.service");
 const { addPropertyRooms } = require("./propertyRooms.service");
 const { addPropertyComodities } = require("./propertyComodities.service");
 const { nanoid } = require("nanoid");
+const { where } = require("sequelize");
 
 
 
@@ -148,7 +149,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
 
   const props = await Property.findAndCountAll({
     where: {
-      tenantId:tenantId
+      tenantId
     },
     limit,
     offset,
@@ -167,7 +168,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
     ],
     include: [
       {
-        model: Features,
+        model: PropertyRooms,
       },
       {
         model: PropertyType,
@@ -180,7 +181,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
       {
         model: Neighborhood,
         attributes: ["name"],
-      },
+      }
     ],
   });
 
@@ -221,6 +222,17 @@ const toggleIsActiveProperty = async (propertyId, tenantId, userId) => {
   return property;
 
 };
+
+const fetchFilteredProperties = async (filter = {}, tenantId) => {
+
+    const properties = await Property.findAll({
+      where:{
+        tenantId,
+        isActive: true
+      }
+    })
+
+}
 
 module.exports = {
   addProperty,

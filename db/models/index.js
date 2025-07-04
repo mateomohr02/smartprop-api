@@ -49,29 +49,57 @@ db.PropertyType.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 db.Tenant.hasMany(db.Characteristic, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
 db.Characteristic.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 
-// Tenant → PropertyRooms
-db.Tenant.hasMany(db.PropertyRooms, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
-db.PropertyRooms.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
+//Tenant → Comodity
+db.Tenant.hasMany(db.Comodity, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
+db.Comodity.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 
-// Tenant → PropertyComities
-db.Tenant.hasMany(db.PropertyComodities, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
-db.PropertyComodities.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
+//Tenant → Room
+db.Tenant.hasMany(db.Room, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
+db.Room.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
+
+//Tenant → Characteristic
+db.Tenant.hasMany(db.Characteristic, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
+db.Characteristic.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 
 // Tenant → PropertyCharacteristic
 db.Tenant.hasMany(db.PropertyCharacteristic, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
 db.PropertyCharacteristic.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
 
-// Property → PropertyType
+// Tenant → PropertyRoom
+db.Tenant.hasMany(db.PropertyRoom, { foreignKey: 'tenantId', onDelete: 'CASCADE' });
+db.PropertyRoom.belongsTo(db.Tenant, { foreignKey: 'tenantId' });
+
+//Relaciones entre Propiedades y atributos
+
+// Property ↔ PropertyType
 db.PropertyType.hasMany(db.Property, { foreignKey: 'propertyTypeId' });
 db.Property.belongsTo(db.PropertyType, { foreignKey: 'propertyTypeId' });
 
-// Property → PropertyRooms (1:1)
-db.Property.hasOne(db.PropertyRooms, { foreignKey: 'propertyId', onDelete: 'CASCADE' });
-db.PropertyRooms.belongsTo(db.Property, { foreignKey: 'propertyId' });
+// Property ↔ Room (N:M) via PropertyRoom
+db.Property.belongsToMany(db.Room, {
+  through: db.PropertyRoom,
+  foreignKey: 'propertyId',
+  otherKey: 'roomId',
+});
 
-// Property → PropertyComodities (1:1)
-db.Property.hasOne(db.PropertyComodities, { foreignKey: 'propertyId', onDelete: 'CASCADE' });
-db.PropertyComodities.belongsTo(db.Property, { foreignKey: 'propertyId' });
+db.Room.belongsToMany(db.Property, {
+  through: db.PropertyRoom,
+  foreignKey: 'roomId',
+  otherKey: 'propertyId',
+});
+
+// Property ↔ Comodity (N:M) via PropertyComodity
+db.Property.belongsToMany(db.Comodity, {
+  through: db.PropertyComodity,
+  foreignKey: 'propertyId',
+  otherKey: 'comodityId',
+});
+
+db.Comodity.belongsToMany(db.Property, {
+  through: db.PropertyComodity,
+  foreignKey: 'comodityId',
+  otherKey: 'propertyId',
+});
 
 // Property ↔ Characteristic (N:M) via PropertyCharacteristic
 db.Property.belongsToMany(db.Characteristic, {
@@ -79,6 +107,7 @@ db.Property.belongsToMany(db.Characteristic, {
   foreignKey: 'propertyId',
   otherKey: 'characteristicId',
 });
+
 db.Characteristic.belongsToMany(db.Property, {
   through: db.PropertyCharacteristic,
   foreignKey: 'characteristicId',
@@ -86,6 +115,7 @@ db.Characteristic.belongsToMany(db.Property, {
 });
 
 // Ubicación de Property
+
 db.Country.hasMany(db.Province, { foreignKey: 'countryId' });
 db.Province.belongsTo(db.Country, { foreignKey: 'countryId' });
 

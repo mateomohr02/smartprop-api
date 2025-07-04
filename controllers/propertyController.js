@@ -1,5 +1,5 @@
 const catchAsync = require("../utils/catchAsync");
-const { addProperty, fetchPropertiesTenantId, toggleIsActiveProperty } = require("../services/property/property.service");
+const { addProperty, fetchPropertiesTenantId, toggleIsActiveProperty, fetchFilterdProperties } = require("../services/property/property.service");
 
 const createProperty = catchAsync(async (req,res,next) => {
 
@@ -33,13 +33,30 @@ const setIsActiveProperty = catchAsync(async (req, res) => {
   res.status(200).json({ status: "success", data: property });
 })
 
-const getCatalogue = catchAsync( async (req, res) => {
-    const {filter} = req.body;
-    
+const getPropertiesFiltered = catchAsync( async (req, res) => {
+
+    let filter;
+
+    if (req.query.filter) {
+      filter = req.body;
+    }
+
+    const { id } = req.tenant
+
+    const properties = fetchFilterdProperties(filter, id);
+
+    res.status(200).json({
+    status: "success",
+    results: properties.length,
+    data: {
+      properties,
+    },
+  });
 })
 
 module.exports = {
     createProperty,
     getPropertiesTenant,
-    setIsActiveProperty
+    setIsActiveProperty,
+    getPropertiesFiltered
 }
