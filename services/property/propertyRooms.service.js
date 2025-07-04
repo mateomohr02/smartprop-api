@@ -28,6 +28,13 @@ const addPropertyRooms = async (
   return addedPropertyRooms ;
 };
 
+const fetchOrCreateRooms = async (propertyRooms, tenantId) => {
+  if (!propertyRooms || !tenantId  ) {
+    throw new AppError("Missing Parmeters while adding Property Rooms", 400);
+    
+  }
+}
+
 module.exports = {
   addPropertyRooms
 };

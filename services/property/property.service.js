@@ -14,9 +14,6 @@ const { fetchOrCreatePlace } = require("../places/places.service");
 const { addPropertyRooms } = require("./propertyRooms.service");
 const { addPropertyComodities } = require("./propertyComodities.service");
 const { nanoid } = require("nanoid");
-const { where } = require("sequelize");
-
-
 
 const addProperty = async (
   {
@@ -40,19 +37,15 @@ const addProperty = async (
     throw new AppError("Missing parameters to create a Property", 400);
   }
 
+  const roomsIds = await fetchOrCreateRooms(propertyRooms, tenant.id);
+
   //Example: Characteristics = [characteristic1Slug, characteristic2Slug, newCharacteristicName1, characteristic3Slug]
-  const characteristicsIds = await fetchandCreateCharacteristics(
-    characteristics,
-    tenant.id
-  );
+  const characteristicsIds = await fetchandCreateCharacteristics(characteristics, tenant.id);
   //Example = CharacteristicsIds = ['1', '2', '4', '3']
   //Example: PropertyType = "casa":slug
   //         PropertyType = "casa quinta":name : nuevoRegistro
   //         Se guarda como: "Casa Quinta" retorna id del nuevo registro
-  const propertyTypeId = await fetchOrCreatePropertyType(
-    propertyType,
-    tenant.id
-  );
+  const propertyTypeId = await fetchOrCreatePropertyType(propertyType, tenant.id);
 
   //Example = PropertyTypeId = 1
   if (!characteristicsIds.length || !propertyTypeId) {

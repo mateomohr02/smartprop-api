@@ -28,6 +28,15 @@ module.exports = {
         },
         onDelete: 'CASCADE'
       },
+      value: {
+        type: Sequelize.INTEGER, 
+        allowNull: false,
+        defaultValue: 1,
+      },
+      size: {
+        type: Sequelize.FLOAT, 
+        allowNull: true,
+      },
       tenantId: {
         type: Sequelize.UUID,
         allowNull: false,
