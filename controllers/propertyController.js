@@ -10,6 +10,7 @@ const createProperty = catchAsync(async (req,res,next) => {
     message: "Property Added Successfully",
     data: property,
   });
+  
 });
 
 const getPropertiesTenant = catchAsync(async (req, res) => {

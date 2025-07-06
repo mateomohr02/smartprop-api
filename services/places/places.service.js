@@ -22,8 +22,7 @@ const fetchOrCreatePlace = async ({ countryInput, provinceInput, cityInput, neig
     if (!countryInput || !provinceInput || !cityInput || !neighborhoodInput) {
     throw new AppError("Missing place data", 400);
   }
-
-
+  
   //busca un country donde slug == argentina EXISTE
   const country = await findOrCreatePlace(
     Country,

@@ -4,78 +4,104 @@ const {
   PropertyType,
   City,
   Neighborhood,
-  User
+  User,
 } = require("../../db/models");
 const AppError = require("../../utils/appError");
 const { nameFormatter, slugFormatter } = require("../../utils/stringFormatter");
 const { fetchandCreateCharacteristics } = require("./characteristic.service");
 const { fetchOrCreatePropertyType } = require("./propertyType.service");
 const { fetchOrCreatePlace } = require("../places/places.service");
-const { addPropertyRooms } = require("./propertyRooms.service");
-const { addPropertyComodities } = require("./propertyComodities.service");
+const { addPropertyOtherRooms } = require("./rooms.service");
+const { addPropertyComodities } = require("./comodities.service");
 const { nanoid } = require("nanoid");
 
 const addProperty = async (
   {
-    title, price, priceFIAT, expenses, expensesFIAT, financing,
-    operation, propertyType, address, mapLocation, description,
-    multimedia, surface, condition, age, availabilityType, services,
-    availabilityDate, place, characteristics, propertyRooms, propertyComodities
+    title,
+    price,
+    priceFIAT,
+    expenses = 0,
+    expensesFIAT = "ARS",
+    operation,
+    financing = null,
+    propertyTypeSlug,
+    address,
+    mapLocation,
+    description,
+    multimedia,
+    surface,
+    services,
+    condition,
+    age,
+    availabilityType,
+    availabilityDate = new Date(),
+    place,
+    rooms = 0,
+    bedrooms = 0,
+    bathrooms = 0,
+    otherRooms = [],
+    comodities,
+    characteristics,
   },
   tenant
 ) => {
   if (
-    !characteristics || !propertyComodities || !propertyRooms || !propertyType ||
-    !title ||  !description || !address || !mapLocation ||  !multimedia || !place ||
-    !priceFIAT || !price || 
-    !operation ||   
+    !title ||
+    !price ||
+    !priceFIAT ||
+    !operation ||
+    !propertyTypeSlug ||
+    !description ||
+    !address ||
+    !mapLocation ||
+    !multimedia ||
+    !place ||
     !surface ||
-    !condition || !age ||
+    !condition ||
+    !age ||
     !availabilityType ||
-    !tenant.id
+    !tenant?.id
   ) {
     throw new AppError("Missing parameters to create a Property", 400);
   }
 
-  const roomsIds = await fetchOrCreateRooms(propertyRooms, tenant.id);
+  const shortId = nanoid(6);
+  let addedPropertyComodities = [];
+  let addedPropertyRooms = [];
+  let addedPropertyCharacteristics = [];
+  let addedPropertyType;
 
-  //Example: Characteristics = [characteristic1Slug, characteristic2Slug, newCharacteristicName1, characteristic3Slug]
-  const characteristicsIds = await fetchandCreateCharacteristics(characteristics, tenant.id);
-  //Example = CharacteristicsIds = ['1', '2', '4', '3']
-  //Example: PropertyType = "casa":slug
-  //         PropertyType = "casa quinta":name : nuevoRegistro
-  //         Se guarda como: "Casa Quinta" retorna id del nuevo registro
-  const propertyTypeId = await fetchOrCreatePropertyType(propertyType, tenant.id);
-
-  //Example = PropertyTypeId = 1
-  if (!characteristicsIds.length || !propertyTypeId) {
-    throw new AppError(
-      "Error while trying to add Characteristics or the Property Type",
-      400
+  if (characteristics) {
+    //Example: Characteristics = [characteristic1Slug, characteristic2Slug, newCharacteristicName1, characteristic3Slug]
+    addedPropertyCharacteristics = await fetchandCreateCharacteristics(
+      characteristics,
+      tenant.id
     );
   }
 
-  //Place:
-  //{
-  // countryInput:'argentina', ->slug
-  // provinceInput: 'cordoba', ->slug
-  // cityInput: 'cordoba' ->slug
-  // neighborhoodInput: 'URCA' ->name ingresado por el usuario
-  //}
+  if (propertyTypeSlug) {
+    addedPropertyType = await fetchOrCreatePropertyType(
+      propertyTypeSlug,
+      tenant.id
+    );
+  }
+
   const { countryId, provinceId, city, neighborhood } =
     await fetchOrCreatePlace(place);
 
-  //Recibe IDs correpondientes
-
-  const shortId = nanoid(6);
-
-  const propertySlug = slugFormatter(`${operation === 'sale' ? "venta" : operation === 'rent' ? 'alquiler' : 'short-term'} ${title} ${propertyRooms.rooms} "ambientes" ${address} "en" ${city.name} ${neighborhood.name} ${price} ${priceFIAT} ${tenant.name} ${shortId}`)
+  const propertySlug = slugFormatter(
+    `${
+      operation === "sale"
+        ? "venta"
+        : operation === "rent"
+        ? "alquiler"
+        : "short-term"
+    } ${title} ${rooms} "ambientes" ${address} "en" ${city.name} ${
+      neighborhood.name
+    } ${price} ${priceFIAT} ${tenant.name} ${shortId}`
+  );
 
   const formattedProppertyTitle = nameFormatter(title);
-
-  const financingProp = financing || null;
-
-  const finalAvailabilityDate = availabilityDate || new Date();
 
   const newProp = await Property.create({
     title: formattedProppertyTitle,
@@ -84,9 +110,9 @@ const addProperty = async (
     slug: propertySlug,
     expenses,
     expensesFIAT,
-    financing: financingProp,
+    financing,
     operation,
-    propertyTypeId,
+    propertyTypeId: addedPropertyType,
     address,
     mapLocation,
     description,
@@ -96,9 +122,12 @@ const addProperty = async (
     age,
     services,
     availabilityType,
-    finalAvailabilityDate,
+    availabilityDate,
     countryId,
     provinceId,
+    rooms,
+    bedrooms,
+    bathrooms,
     cityId: city.id,
     neighborhoodId: neighborhood.id,
     tenantId: tenant.id,
@@ -108,23 +137,21 @@ const addProperty = async (
     throw new AppError("Error while creating the property", 404);
   }
 
-  //CREAMOS EL DATO DE LOS AMBIENTES DE LA PROPIEDAD
-  //FEATURE:
-  //rooms N
-  //bedrooms N
-  //bathrooms N
-  //toilettes N
-  //garage N
-  //balcony m2
-  //meetingsRoom SUM EDIFICIOS T/F
-  //pool T/F
-  //laundryRoom T/F
-  //roofTop TERRAZA T/F
-  //kitchen T/F
+  if (otherRooms.length > 0) {
+    addedPropertyRooms = await addPropertyOtherRooms(
+      otherRooms,
+      newProp.id,
+      tenant.id
+    );
+  }
 
-  const addedPropertyRooms = await addPropertyRooms(propertyRooms, newProp.id, tenant.id);
-  const addedPropertyComodities = await addPropertyComodities(propertyComodities, newProp.id, tenant.id)
-
+  if (comodities.length > 0) {
+    addedPropertyComodities = await addPropertyComodities(
+      comodities,
+      newProp.id,
+      tenant.id
+    );
+  }
 
   return { newProp, addedPropertyRooms, addedPropertyComodities };
 };
@@ -142,7 +169,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
 
   const props = await Property.findAndCountAll({
     where: {
-      tenantId
+      tenantId,
     },
     limit,
     offset,
@@ -174,7 +201,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
       {
         model: Neighborhood,
         attributes: ["name"],
-      }
+      },
     ],
   });
 
@@ -199,10 +226,10 @@ const toggleIsActiveProperty = async (propertyId, tenantId, userId) => {
 
   const user = await User.findOne({
     where: {
-      id:userId,
-      tenantId
-    }
-  })
+      id: userId,
+      tenantId,
+    },
+  });
 
   if (!user || !user.isValidated) {
     throw new AppError("User not found or unalowed.", 403);
@@ -213,19 +240,16 @@ const toggleIsActiveProperty = async (propertyId, tenantId, userId) => {
   await property.save();
 
   return property;
-
 };
 
 const fetchFilteredProperties = async (filter = {}, tenantId) => {
-
-    const properties = await Property.findAll({
-      where:{
-        tenantId,
-        isActive: true
-      }
-    })
-
-}
+  const properties = await Property.findAll({
+    where: {
+      tenantId,
+      isActive: true,
+    },
+  });
+};
 
 module.exports = {
   addProperty,

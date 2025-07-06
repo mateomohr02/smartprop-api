@@ -28,7 +28,6 @@ const fetchOrCreatePropertyType = async (propertyTypeSlug, tenantId) => {
     return created.id;
   }
 
-  //REOTRNA ID DEL TIPO DE PROPIEDAD ENCONTRADO
 
   return existingPropertyType.id;
 };
