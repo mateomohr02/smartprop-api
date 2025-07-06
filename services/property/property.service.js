@@ -182,14 +182,14 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
       "expenses",
       "expensesFIAT",
       "surface",
+      "rooms",
+      "bedrooms",
+      "bathrooms",
       "multimedia",
       "operation",
       "visualizations",
     ],
     include: [
-      {
-        model: PropertyRooms,
-      },
       {
         model: PropertyType,
         attributes: ["name"],

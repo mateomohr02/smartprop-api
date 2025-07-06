@@ -112,6 +112,21 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",
       },
+      rooms: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      bedrooms: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      bathrooms: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0, 
+      },
       surface: {
         type: Sequelize.JSONB,
         allowNull: false,

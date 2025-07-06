@@ -112,6 +112,21 @@ module.exports = (sequelize, DataTypes) => {
       },
 
       //DATOS DESCRIPTIVOS
+      rooms: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      bedrooms: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      bathrooms: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0, 
+      },
       surface: {
         type: DataTypes.JSONB,
         allowNull: false,
