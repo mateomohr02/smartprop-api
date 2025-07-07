@@ -1,9 +1,16 @@
 const {
   Property,
-  PropertyRooms,
-  PropertyType,
+  PropertyComodity,
+  PropertyRoom,
+  PropertyCharacteristic,
+  Room,
+  Comodity,
+  Characteristic,
+  Country,
+  Province,
   City,
   Neighborhood,
+  PropertyType,
   User,
 } = require("../../db/models");
 const AppError = require("../../utils/appError");
@@ -39,6 +46,7 @@ const addProperty = async (
     rooms = 0,
     bedrooms = 0,
     bathrooms = 0,
+    garages = 0,
     otherRooms = [],
     comodities,
     characteristics,
@@ -128,6 +136,7 @@ const addProperty = async (
     rooms,
     bedrooms,
     bathrooms,
+    garages,
     cityId: city.id,
     neighborhoodId: neighborhood.id,
     tenantId: tenant.id,
@@ -170,6 +179,7 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
   const props = await Property.findAndCountAll({
     where: {
       tenantId,
+      isActive: true,
     },
     limit,
     offset,
@@ -242,17 +252,218 @@ const toggleIsActiveProperty = async (propertyId, tenantId, userId) => {
   return property;
 };
 
-const fetchFilteredProperties = async (filter = {}, tenantId) => {
+const searchPropertiesService = async (filters, tenantId) => {
+  const where = {};
+  const include = [];
+
+  // Filtros directos
+  if (filters.operation) where.operation = filters.operation;
+  if (filters.city)
+    include.push({ model: City, where: { slug: filters.city } });
+  if (filters.neighborhood)
+    include.push({
+      model: Neighborhood,
+      where: { slug: filters.neighborhood },
+    });
+  if (filters.minBathrooms)
+    where.bathrooms = { [Op.gte]: filters.minBathrooms };
+  if (filters.minGarages) where.garages = { [Op.gte]: filters.minGarages };
+  if (filters.minBedrooms) where.bedrooms = { [Op.gte]: filters.minBedrooms };
+  if (filters.maxBedrooms)
+    where.bedrooms = {
+      ...(where.bedrooms || {}),
+      [Op.lte]: filters.maxBedrooms,
+    };
+  if (filters.minAmbientes) where.rooms = { [Op.gte]: filters.minAmbientes };
+  if (filters.maxAmbientes)
+    where.rooms = { ...(where.rooms || {}), [Op.lte]: filters.maxAmbientes };
+
+  // Filtros por comodities
+  if (filters.comodities?.length > 0) {
+    include.push({
+      model: Comodity,
+      where: { slug: { [Op.in]: filters.comodities, tenantId } },
+      through: { attributes: [] },
+    });
+  }
+
+  // Filtros por rooms
+  if (filters.rooms?.length > 0) {
+    include.push({
+      model: Room,
+      where: { slug: { [Op.in]: filters.rooms, tenantId } },
+      through: { attributes: [] },
+    });
+  }
+
+  // Filtros por características
+  if (filters.characteristics?.length > 0) {
+    include.push({
+      model: Characteristic,
+      where: { slug: { [Op.in]: filters.characteristics, tenantId } },
+      through: { attributes: [] },
+    });
+  }
+
+  // Filtros por tipo de propiedad
+  if (filters.propertyTypes?.length > 0) {
+    include.push({
+      model: PropertyType,
+      where: { slug: { [Op.in]: filters.propertyTypes, tenantId } },
+    });
+  }
+
+  const properties = await Property.findAll({
+    where,
+    include,
+  });
+
+  return properties;
+};
+
+const getFiltersForTenantService = async (tenantId) => {
+  const [
+    availablePropertyTypes,
+    availableComodities,
+    availableRooms,
+    availableCharacteristics,
+    properties,
+  ] = await Promise.all([
+    PropertyType.findAll({ where: { tenantId } }),
+    Comodity.findAll({ where: { tenantId } }),
+    Room.findAll({ where: { tenantId } }),
+    Characteristic.findAll({ where: { tenantId } }),
+    Property.findAll({
+      where: { tenantId, isActive: true },
+      attributes: ["countryId", "provinceId", "cityId", "neighborhoodId"],
+      raw: true,
+    }),
+  ]);
+  const uniqueCountryIds = [...new Set(properties.map((p) => p.countryId))];
+  const uniqueProvinceIds = [...new Set(properties.map((p) => p.provinceId))];
+  const uniqueCityIds = [...new Set(properties.map((p) => p.cityId))];
+  const uniqueNeighborhoodIds = [
+    ...new Set(properties.map((p) => p.neighborhoodId)),
+  ];
+
+  const [countries, provinces, cities, neighborhoods] = await Promise.all([
+    Country.findAll({
+      where: { id: uniqueCountryIds },
+    }),
+    Province.findAll({
+      where: { id: uniqueProvinceIds },
+    }),
+    City.findAll({
+      where: { id: uniqueCityIds },
+    }),
+    Neighborhood.findAll({
+      where: { id: uniqueNeighborhoodIds },
+    }),
+  ]);
+
+  return {
+    availablePropertyTypes,
+    availableComodities,
+    availableRooms,
+    availableCharacteristics,
+    countries,
+    provinces,
+    cities,
+    neighborhoods,
+  };
+};
+
+const fetchPropertiesSlugs = async (tenantId) => {
+  let slugs = [];
+
+  slugs = await Property.findAll({
+    where: {
+      tenantId,
+      isActive: true,
+    },
+    attributes: ["slug"],
+  });
+
+  return slugs;
+};
+
+const fetchActiveProperties = async (tenantId) => {
   const properties = await Property.findAll({
     where: {
       tenantId,
       isActive: true,
     },
+    attributes: [
+      "id",
+      "slug",
+      "title",
+      "price",
+      "priceFIAT",
+      "expenses",
+      "expensesFIAT",
+      "surface",
+      "rooms",
+      "bedrooms",
+      "bathrooms",
+      "garages",
+      "multimedia",
+    ],
+    include: [
+      {
+        model: PropertyType,
+        attributes: ["name", "slug"],
+      },
+      {
+        model: City,
+        attributes: ["name", "slug"],
+      },
+      {
+        model: Neighborhood,
+        attributes: ["name", "slug"],
+      },
+    ],
   });
+
+  return properties;
+};
+
+const getPropertyDetailService = async (propertySlug, tenantId) => {
+  if (!tenantId || !propertySlug) return {};
+
+  const prop = await Property.findOne({
+    where: { slug: propertySlug, tenantId },
+    include: [
+      { model: PropertyType, attributes: ["name"] },
+      { model: City, attributes: ["name"] },
+      { model: Neighborhood, attributes: ["name"] },
+      {
+        model: Comodity,
+        through: { attributes: [] },
+        attributes: ["name"],
+      },
+      {
+        model: Characteristic,
+        through: { attributes: [] },
+        attributes: ["name"],
+      },
+      {
+        model: Room,
+        through: { attributes: [] },
+        attributes: ["name"],
+      },
+    ],
+  });
+
+  return prop;
 };
 
 module.exports = {
   addProperty,
   fetchPropertiesTenantId,
   toggleIsActiveProperty,
+  searchPropertiesService,
+  getFiltersForTenantService,
+  fetchPropertiesSlugs,
+  fetchActiveProperties,
+  getPropertyDetailService,
 };

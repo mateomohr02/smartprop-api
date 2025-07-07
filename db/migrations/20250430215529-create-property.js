@@ -127,6 +127,11 @@ module.exports = {
         allowNull: false,
         defaultValue: 0, 
       },
+      garages: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       surface: {
         type: Sequelize.JSONB,
         allowNull: false,

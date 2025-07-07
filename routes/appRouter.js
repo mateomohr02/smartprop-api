@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.use('/tenants', tenantRouter);
 router.use('/auth', resolveTenant, authRouter);
-router.use('/properties', resolveTenant, validateUser, propertyRouter);
+router.use('/properties', resolveTenant, propertyRouter);
 router.use('/users', resolveTenant, validateUser, userRouter);
 router.use('/mercado-pago', resolveTenant, validateUser, mpRouter);
 router.use('/cloudinary', resolveTenant, validateUser, cloudinaryRouter);
