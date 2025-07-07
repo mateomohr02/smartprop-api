@@ -79,14 +79,6 @@ const addProperty = async (
   let addedPropertyCharacteristics = [];
   let addedPropertyType;
 
-  if (characteristics) {
-    //Example: Characteristics = [characteristic1Slug, characteristic2Slug, newCharacteristicName1, characteristic3Slug]
-    addedPropertyCharacteristics = await fetchandCreateCharacteristics(
-      characteristics,
-      tenant.id
-    );
-  }
-
   if (propertyTypeSlug) {
     addedPropertyType = await fetchOrCreatePropertyType(
       propertyTypeSlug,
@@ -157,6 +149,14 @@ const addProperty = async (
   if (comodities.length > 0) {
     addedPropertyComodities = await addPropertyComodities(
       comodities,
+      newProp.id,
+      tenant.id
+    );
+  }
+
+  if (characteristics.length > 0) {
+    addedPropertyCharacteristics = await fetchandCreateCharacteristics(
+      characteristics,
       newProp.id,
       tenant.id
     );
