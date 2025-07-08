@@ -61,7 +61,7 @@ const getFiltersForTenant = catchAsync(async (req, res) => {
   const tenantId = req.tenant.id;
   const filters = await getFiltersForTenantService(tenantId);
 
-  res.status(200).json({ status: "success", data: filters });
+  res.status(200).json({ status: "success", filters });
 });
 
 

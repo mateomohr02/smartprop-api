@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: true 
     },
+    //id del post o de la prop
     tenantId: {
       type: DataTypes.UUID,
       allowNull: false,
