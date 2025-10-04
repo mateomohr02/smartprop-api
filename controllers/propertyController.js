@@ -46,11 +46,13 @@ const setIsActiveProperty = catchAsync(async (req, res) => {
 });
 
 const getPropertiesFiltered = catchAsync(async (req, res) => {
-  const { slug } = req.params;
+  const tenantId = req.tenant.id;
+  const moreFilters = req.query;
+  const { filterSlug } = req.params;
 
-  const filters = parseSlugToFilters(slug); // función para convertir el slug a filtros reales
+  const filters = parseSlugToFilters(filterSlug, moreFilters, tenantId); // parser url slugs a obj filter
 
-  const properties = await searchPropertiesService(filters);
+  //const properties = await searchPropertiesService(filters);
 
   res
     .status(200)
