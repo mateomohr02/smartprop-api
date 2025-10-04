@@ -6,7 +6,8 @@ const {
   getFiltersForTenantService,
   fetchPropertiesSlugs,
   fetchActiveProperties,
-  getPropertyDetailService
+  getPropertyDetailService,
+  searchPropertiesService
 } = require("../services/property/property.service");
 const { parseSlugToFilters } = require("../utils/parseSlugToFilters");
 
@@ -50,9 +51,21 @@ const getPropertiesFiltered = catchAsync(async (req, res) => {
   const moreFilters = req.query;
   const { filterSlug } = req.params;
 
-  const filters = parseSlugToFilters(filterSlug, moreFilters, tenantId); // parser url slugs a obj filter
+  const {filters, errors} = await parseSlugToFilters(filterSlug, moreFilters, tenantId); 
 
-  //const properties = await searchPropertiesService(filters);
+  if (errors && errors.length > 0) {
+    return res.status(400).json({
+      status: "error",
+      message: "Hubo errores en los filtros",
+      errors,
+    });
+  }
+
+  console.log(filters, 'filters in controller');
+  
+  console.log(tenantId, 'tenantId in controller');
+
+  const properties = await searchPropertiesService(filters, tenantId);
 
   res
     .status(200)

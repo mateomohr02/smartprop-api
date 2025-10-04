@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const {
   Property,
   PropertyComodity,
@@ -253,69 +254,126 @@ const toggleIsActiveProperty = async (propertyId, tenantId, userId) => {
 };
 
 const searchPropertiesService = async (filters, tenantId) => {
-  const where = {};
+  const where = {
+    tenantId,
+  };
   const include = [];
 
-  // Filtros directos
-  if (filters.operation) where.operation = filters.operation;
-  if (filters.city)
-    include.push({ model: City, where: { slug: filters.city } });
-  if (filters.neighborhood)
-    include.push({
-      model: Neighborhood,
-      where: { slug: filters.neighborhood },
-    });
-  if (filters.minBathrooms)
-    where.bathrooms = { [Op.gte]: filters.minBathrooms };
-  if (filters.minGarages) where.garages = { [Op.gte]: filters.minGarages };
-  if (filters.minBedrooms) where.bedrooms = { [Op.gte]: filters.minBedrooms };
-  if (filters.maxBedrooms)
-    where.bedrooms = {
-      ...(where.bedrooms || {}),
-      [Op.lte]: filters.maxBedrooms,
-    };
-  if (filters.minAmbientes) where.rooms = { [Op.gte]: filters.minAmbientes };
-  if (filters.maxAmbientes)
-    where.rooms = { ...(where.rooms || {}), [Op.lte]: filters.maxAmbientes };
+  // --- Operación (rent / sale) ---
+  if (filters.operation) {
+    where.operation = filters.operation;
+  }
 
-  // Filtros por comodities
-  if (filters.comodities?.length > 0) {
+  // --- Tipos de propiedad ---
+  if (filters.propertyTypes?.length) {
+    where.propertyTypeId = {
+      [Op.in]: filters.propertyTypes,
+    };
+  }
+
+  // --- Localización ---
+  if (filters.city) {
+    where.cityId = filters.city;
+    include.push({ model: City, attributes: ["id", "name", "slug"] });
+  }
+
+  if (filters.neighborhood) {
+    where.neighborhoodId = filters.neighborhood;
+    include.push({ model: Neighborhood, attributes: ["id", "name", "slug"] });
+  }
+
+  // --- Rango de precios ---
+  if (filters.minPrice || filters.maxPrice) {
+    where.price = {};
+    if (filters.minPrice) where.price[Op.gte] = filters.minPrice;
+    if (filters.maxPrice) where.price[Op.lte] = filters.maxPrice;
+  }
+
+  // Moneda
+  if (filters.currency) {
+    where.priceFIAT = filters.currency.toUpperCase();
+  }
+
+  // --- Rango de expensas ---
+  if (filters.minExpenses || filters.maxExpenses) {
+    where.expenses = {};
+    if (filters.minExpenses) where.expenses[Op.gte] = filters.minExpenses;
+    if (filters.maxExpenses) where.expenses[Op.lte] = filters.maxExpenses;
+  }
+  if (filters.expensesCurrency) {
+    where.expensesFIAT = filters.expensesCurrency.toUpperCase();
+  }
+
+  // --- Dormitorios ---
+  if (filters.minBedrooms || filters.maxBedrooms) {
+    where.bedrooms = {};
+    if (filters.minBedrooms) where.bedrooms[Op.gte] = filters.minBedrooms;
+    if (filters.maxBedrooms) where.bedrooms[Op.lte] = filters.maxBedrooms;
+  }
+
+  // --- Ambientes ---
+  if (filters.minAmbientes || filters.maxAmbientes) {
+    where.rooms = {};
+    if (filters.minAmbientes) where.rooms[Op.gte] = filters.minAmbientes;
+    if (filters.maxAmbientes) where.rooms[Op.lte] = filters.maxAmbientes;
+  }
+
+  // --- Baños ---
+  if (filters.minBathrooms) {
+    where.bathrooms = { [Op.gte]: filters.minBathrooms };
+  }
+
+  // --- Garage ---
+  if (filters.minGarages) {
+    where.garages = { [Op.gte]: filters.minGarages };
+  }
+
+  // --- Relacionales: comodities, rooms, services, characteristics ---
+  if (filters.comodities?.length) {
     include.push({
       model: Comodity,
-      where: { slug: { [Op.in]: filters.comodities, tenantId } },
-      through: { attributes: [] },
+      where: { slug: { [Op.in]: filters.comodities } },
+      required: true,
+      attributes: ["id", "name", "slug"],
+      through: { attributes: [] }, // para evitar campos de la tabla pivote
     });
   }
 
-  // Filtros por rooms
-  if (filters.rooms?.length > 0) {
+  if (filters.rooms?.length) {
     include.push({
       model: Room,
-      where: { slug: { [Op.in]: filters.rooms, tenantId } },
+      where: { slug: { [Op.in]: filters.rooms } },
+      required: true,
+      attributes: ["id", "name", "slug"],
       through: { attributes: [] },
     });
   }
 
-  // Filtros por características
-  if (filters.characteristics?.length > 0) {
+  if (filters.services?.length) {
+    include.push({
+      model: Service,
+      where: { slug: { [Op.in]: filters.services } },
+      required: true,
+      attributes: ["id", "name", "slug"],
+      through: { attributes: [] },
+    });
+  }
+
+  if (filters.characteristics?.length) {
     include.push({
       model: Characteristic,
-      where: { slug: { [Op.in]: filters.characteristics, tenantId } },
+      where: { slug: { [Op.in]: filters.characteristics } },
+      required: true,
+      attributes: ["id", "name", "slug"],
       through: { attributes: [] },
     });
   }
 
-  // Filtros por tipo de propiedad
-  if (filters.propertyTypes?.length > 0) {
-    include.push({
-      model: PropertyType,
-      where: { slug: { [Op.in]: filters.propertyTypes, tenantId } },
-    });
-  }
-
+  // --- Ejecución de la query ---
   const properties = await Property.findAll({
     where,
     include,
+    distinct: true, // para evitar duplicados si hay muchos JOINs
   });
 
   return properties;

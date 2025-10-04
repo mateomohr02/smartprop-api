@@ -32,6 +32,7 @@ async function validateArrayFilter(query, queryKey, Model, tenantId) {
 }
 
 const parseSlugToFilters = async (slug, query, tenantId) => {
+
   const parts = slug.split("-");
 
   const filters = {
@@ -283,8 +284,6 @@ if (parts[4] && parts[4] !== "ciudad" && parts[4] !== "barrio") {
       message: "El rango de ambientes es inválido",
     };
   }
-
-  console.log(filters, errorMessages, "return backend");
 
   return {
     filters,
