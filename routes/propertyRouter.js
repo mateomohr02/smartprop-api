@@ -7,7 +7,7 @@ const router = require("express").Router();
 
 router.route("/detail/:propertySlug").get(getPropertyDetail)
 router.route("/slugs").get(getPropertiesSlugs);
-router.route("/catalogue/:filterSlug").post(getPropertiesFiltered);
+router.route("/catalogue/:filterSlug").get(getPropertiesFiltered);
 router.route("/").get(getPropertiesTenant);
 router.route("/active").get(getActivePropertiesTenant);
 router.route("/create").post(validate(createPropertySchema) ,createProperty);
