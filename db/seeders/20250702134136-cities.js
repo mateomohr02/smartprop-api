@@ -18,7 +18,7 @@ module.exports = {
       },
       {
         id: "6dab2b7e-e3c0-4353-a95d-e9321d656218",
-        name: "Córodoba",
+        name: "Córdoba",
         slug: "cordoba",
         provinceId: "ed0eb7c7-b527-47b3-909b-eaa97224b522"
       },
