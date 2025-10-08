@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.createTable("PropertyWeeklyStats", {
       id: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.literal("uuid_generate_v4()"),
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
         primaryKey: true,
       },
@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: "Property",
+          model: "Properties",
           key: "id",
         },
         onDelete: "CASCADE",
