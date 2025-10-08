@@ -189,6 +189,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      interactions: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
 
       //PROPIETARIO
       tenantId: {

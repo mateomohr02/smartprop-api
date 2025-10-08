@@ -199,6 +199,8 @@ const fetchPropertiesTenantId = async (limit, page, offset, tenantId) => {
       "multimedia",
       "operation",
       "visualizations",
+      "createdAt",
+      "availabilityDate"
     ],
     include: [
       {

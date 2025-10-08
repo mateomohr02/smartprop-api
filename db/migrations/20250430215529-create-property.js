@@ -188,6 +188,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
+      interactions: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
       tenantId: {
         type: Sequelize.UUID,
         allowNull: false,
