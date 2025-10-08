@@ -19,9 +19,9 @@ const metricSchema = z.object({
     "visualization_prop",
 
     "post_detail_blog",
-    
+
     //Buttons Stats
-    
+
     "whatsapp",
 
     "instagram",
@@ -29,25 +29,11 @@ const metricSchema = z.object({
     "form_send",
 
     "share_prop",
-    
-    "post_share_blog",
-    
-  ]),
-   propertyId: z
-    .union([
-      z.string().uuid(),
-      z.array(z.string().uuid()).nonempty(),
-    ])
-    .optional()
-    .nullable(),
 
-  postId: z
-    .union([
-      z.string().uuid(),
-      z.array(z.string().uuid()).nonempty(),
-    ])
-    .optional()
-    .nullable(),
+    "post_share_blog",
+  ]),
+  propertyId: z.array(z.string().uuid()).nonempty().optional().nullable(),
+  postId: z.array(z.string().uuid()).nonempty().optional().nullable(),
   metadata: z.record(z.string(), z.any()).optional().nullable(),
 });
 

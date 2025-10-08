@@ -1,6 +1,19 @@
 const { where } = require("sequelize");
 const { EventMetric, Property, Post } = require("../../db/models");
 
+const updateProperties = async (ids, field, tenantId) => {
+    if (!Array.isArray(ids) || ids.length === 0) return;
+
+    await Promise.all(
+      ids.map(async (id) => {
+        const property = await Property.findOne({ where: { id, tenantId } });
+        if (!property) return;
+        property[field] = (property[field] || 0) + 1;
+        await property.save();
+      })
+    );
+  };
+
 const catchMetricService = async (metric, tenantId) => {
   const { name, propertyId, postId, metadata } = metric;
 
@@ -63,21 +76,8 @@ const catchMetricService = async (metric, tenantId) => {
       break;
 
     case "visualization_prop":
-      const propertyVisaulization = await Property.findOne({
-        where: {
-          id: propertyId,
-          tenantId,
-        },
-      });
-
-      if (!propertyVisaulization) {
-        throw new AppError("Property Not Found.", 404);
-      }
-
-      propertyVisaulization.visualizations =
-        propertyVisaulization.visualizations + 1;
-
-      await propertyVisaulization.save();
+      
+      await updateProperties(propertyId, "visualizations", tenantId);
 
       break;
 
