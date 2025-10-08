@@ -5,4 +5,5 @@ const router = require("express").Router();
 
 router.route("/metric").post(validate(metricSchema), receiveMetric);
 
+
 module.exports = router;

@@ -11,22 +11,45 @@ module.exports = {
       },
       eventType: {
         type: Sequelize.ENUM(
-          'visit',
-          'detail_prop',
-          'contact',
-          'form_send',
-          'blog_post_detail',
-          'post_share',
-          'prop_share',
-          'visit_blog',
-          'whatsapp',
-          'instagram'
+          //Save Filters
+          "filter",
+
+          //Navigation Stats
+          "visit_site",
+          "visit_blog",
+          "visit_contact",
+          "interaction_prop",
+          "visualization_prop",
+          "post_detail_blog",
+
+          //Buttons Stats
+          "whatsapp",
+          "instagram",
+          "form_send",
+          "share_prop",
+          "post_share_blog"
         ),
         allowNull: false
       },
-      entityId: {
+      propertyId: {
         type: Sequelize.UUID,
-        allowNull: true
+        allowNull: true,
+        references: {
+          model: "Properties",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
+      },
+      postId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: "Posts",
+          key: "id",
+        },
+        onDelete: "CASCADE",
+        onUpdate: "CASCADE"
       },
       tenantId: {
         type: Sequelize.UUID,

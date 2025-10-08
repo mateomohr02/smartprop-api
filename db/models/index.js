@@ -159,6 +159,12 @@ db.PropertyWeeklyStat.belongsTo(db.Property, {
   foreignKey: "propertyId",
 });
 
+//EventMetric <-> Properties y Posts
+db.EventMetric.belongsTo(db.Property, { foreignKey: 'propertyId', onDelete: 'CASCADE' });
+db.EventMetric.belongsTo(db.Post, { foreignKey: 'postId', onDelete: 'CASCADE' });
+db.Property.hasMany(db.EventMetric, { foreignKey: 'propertyId' });
+db.Post.hasMany(db.EventMetric, { foreignKey: 'postId' });
+
 /* Sequelize y exportación */
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
