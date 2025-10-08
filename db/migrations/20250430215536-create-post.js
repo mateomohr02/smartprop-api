@@ -53,6 +53,11 @@ module.exports = {
         allowNull: false,
         defaultValue: 0
       },
+      interactions: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       tenantId: {
         type: Sequelize.UUID,
         allowNull: false,
