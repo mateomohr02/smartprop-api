@@ -51,6 +51,10 @@ module.exports = {
         onDelete: "CASCADE",
         onUpdate: "CASCADE"
       },
+      metadata: {
+        type: Sequelize.JSONB,
+        allowNull: true
+      },
       tenantId: {
         type: Sequelize.UUID,
         allowNull: false,

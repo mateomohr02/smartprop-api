@@ -32,8 +32,8 @@ const metricSchema = z.object({
 
     "post_share_blog",
   ]),
-  propertyId: z.array(z.string().uuid()).nonempty().optional().nullable(),
-  postId: z.array(z.string().uuid()).nonempty().optional().nullable(),
+  propertyId: z.array(z.string().uuid()).optional().nullable(),
+  postId: z.array(z.string().uuid()).optional().nullable(),
   metadata: z.record(z.string(), z.any()).optional().nullable(),
 });
 
