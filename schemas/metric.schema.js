@@ -3,21 +3,21 @@ const z = require("zod");
 const metricSchema = z.object({
   name: z.enum([
     //Save Filters
-
+    //listo
     "filter",
 
     //Navigation Stats
-
+    //listo
     "visit_site",
-
+    //listo
     "visit_blog",
-
+    //listo
     "visit_contact",
-
+    //listo
     "interaction_prop",
-
+    //listo
     "visualization_prop",
-
+    
     "post_detail_blog",
 
     //Buttons Stats
