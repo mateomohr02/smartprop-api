@@ -531,6 +531,7 @@ const getHighlightedPropertiesService = async (tenantId) => {
       ["heat", "DESC"],        
       ["createdAt", "DESC"],   
     ],
+    limit: 10
   });
 
   return properties;
