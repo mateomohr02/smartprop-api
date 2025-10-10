@@ -468,6 +468,11 @@ const fetchActiveProperties = async (tenantId) => {
       "garages",
       "multimedia",
     ],
+    order: [
+      ["isFeatured", "DESC"],  
+      ["heat", "DESC"],        
+      ["createdAt", "DESC"],   
+    ],
     include: [
       {
         model: PropertyType,
