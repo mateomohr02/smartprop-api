@@ -1,18 +1,25 @@
 const { where } = require("sequelize");
-const { EventMetric, Property, Post } = require("../../db/models");
+const {
+  EventMetric,
+  Property,
+  Post,
+  PropertyWeeklyStat,
+} = require("../../db/models");
+const { calculateHeat } = require("../../utils/calculateHeat");
+const { calculateWeek } = require("../../utils/calculateWeek");
 
 const updateProperties = async (ids, field, tenantId) => {
-    if (!Array.isArray(ids) || ids.length === 0) return;
+  if (!Array.isArray(ids) || ids.length === 0) return;
 
-    await Promise.all(
-      ids.map(async (id) => {
-        const property = await Property.findOne({ where: { id, tenantId } });
-        if (!property) return;
-        property[field] = (property[field] || 0) + 1;
-        await property.save();
-      })
-    );
-  };
+  await Promise.all(
+    ids.map(async (id) => {
+      const property = await Property.findOne({ where: { id, tenantId } });
+      if (!property) return;
+      property[field] = (property[field] || 0) + 1;
+      await property.save();
+    })
+  );
+};
 
 const catchMetricService = async (metric, tenantId) => {
   const { name, propertyId, postId, metadata } = metric;
@@ -76,7 +83,6 @@ const catchMetricService = async (metric, tenantId) => {
       break;
 
     case "visualization_prop":
-      
       await updateProperties(propertyId, "visualizations", tenantId);
 
       break;
@@ -159,6 +165,49 @@ const catchMetricService = async (metric, tenantId) => {
   }
 };
 
+const updateHeatPropertiesService = async (tenantId = null) => {
+  const where = tenantId ? { tenantId } : {};
+  const properties = await Property.findAll({ where });
+
+  if (!properties.length) {
+    return;
+  }
+
+  await Promise.all(
+    properties.map(async (property) => {
+      try {
+        const newHeat = calculateHeat(property);
+
+        // Actualiza el valor en la propiedad
+        property.heat = newHeat;
+        await property.save();
+
+        // Registrar histórico semanal
+        await PropertyWeeklyStat.create({
+          propertyId: property.id,
+          tenantId: property.tenantId,
+          heat: newHeat,
+          week: calculateWeek(),
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear(),
+          visualizations: property.visualizations,
+          interactions: property.interactions,
+          reach: property.reach,
+          heat: property.heat,
+        });
+      } catch (err) {
+        const registerError = EventMetric.create({
+          eventType: "error",
+          metadata: {
+            err,
+          },
+        });
+      }
+    })
+  );
+};
+
 module.exports = {
   catchMetricService,
+  updateHeatPropertiesService,
 };

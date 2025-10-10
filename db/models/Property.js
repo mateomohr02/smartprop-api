@@ -178,7 +178,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
       },
       heat: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
       reach: {
