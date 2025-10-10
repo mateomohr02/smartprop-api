@@ -3,10 +3,8 @@ const {
   EventMetric,
   Property,
   Post,
-  PropertyWeeklyStat,
 } = require("../../db/models");
 const { calculateHeat } = require("../../utils/calculateHeat");
-const { calculateWeek } = require("../../utils/calculateWeek");
 
 const updateProperties = async (ids, field, tenantId) => {
   if (!Array.isArray(ids) || ids.length === 0) return;
@@ -169,43 +167,30 @@ const updateHeatPropertiesService = async (tenantId = null) => {
   const where = tenantId ? { tenantId } : {};
   const properties = await Property.findAll({ where });
 
-  if (!properties.length) {
-    return;
-  }
+  if (!properties.length) return { updated: 0, errors: 0 };
+
+  let updated = 0;
+  let errors = 0;
 
   await Promise.all(
     properties.map(async (property) => {
       try {
         const newHeat = calculateHeat(property);
 
-        // Actualiza el valor en la propiedad
         property.heat = newHeat;
         await property.save();
 
-        // Registrar histórico semanal
-        await PropertyWeeklyStat.create({
-          propertyId: property.id,
-          tenantId: property.tenantId,
-          heat: newHeat,
-          week: calculateWeek(),
-          month: new Date().getMonth() + 1,
-          year: new Date().getFullYear(),
-          visualizations: property.visualizations,
-          interactions: property.interactions,
-          reach: property.reach,
-          heat: property.heat,
-        });
+        updated++;
       } catch (err) {
-        const registerError = EventMetric.create({
-          eventType: "error",
-          metadata: {
-            err,
-          },
-        });
+        errors++;
+        console.error(`❌ Error actualizando propiedad ${property.id}:`, err.message);
       }
     })
   );
+
+  return { updated, errors };
 };
+
 
 module.exports = {
   catchMetricService,

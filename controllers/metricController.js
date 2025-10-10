@@ -13,9 +13,12 @@ const receiveMetric = catchAsync(async (req, res) => {
 const updateHeatProperties = catchAsync(async (req, res) => {
   const { tenantId } = req.params;
 
-  updateHeatPropertiesService(tenantId);
+  const result = await updateHeatPropertiesService(tenantId);
 
-  res.status(200).json({ status: "success" });
+  res.status(200).json({
+    status: "success",
+    message: `Proceso completado. Propiedades actualizadas: ${result.updated}, con errores: ${result.errors}`,
+  });
 });
 
 
