@@ -7,7 +7,8 @@ const {
   fetchPropertiesSlugs,
   fetchActiveProperties,
   getPropertyDetailService,
-  searchPropertiesService
+  searchPropertiesService,
+  getHighlightedPropertiesService
 } = require("../services/property/property.service");
 const { parseSlugToFilters } = require("../utils/parseSlugToFilters");
 
@@ -98,6 +99,13 @@ const getPropertyDetail = catchAsync(async (req, res) => {
   res.status(200).json({ status: "success", property });
 });
 
+const getHighlightedProperties = catchAsync(async (req, res) => {
+  const tenantId = req.tenant.id;
+
+  const properties = await getHighlightedPropertiesService(tenantId);
+
+  res.status(200).json({ status: "success", properties });
+})
 
 module.exports = {
   createProperty,
@@ -107,5 +115,6 @@ module.exports = {
   getFiltersForTenant,
   getPropertiesSlugs,
   getActivePropertiesTenant,
-  getPropertyDetail
+  getPropertyDetail,
+  getHighlightedProperties
 };

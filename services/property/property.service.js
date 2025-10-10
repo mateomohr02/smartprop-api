@@ -517,6 +517,25 @@ const getPropertyDetailService = async (propertySlug, tenantId) => {
   return prop;
 };
 
+const getHighlightedPropertiesService = async (tenantId) => {
+  
+  if (!tenantId) {
+    throw new Error("Tenant ID is required");
+  }
+
+
+  const properties = await Property.findAll({
+    where: { tenantId, isActive: true },
+    order: [
+      ["isFeatured", "DESC"],  
+      ["heat", "DESC"],        
+      ["createdAt", "DESC"],   
+    ],
+  });
+
+  return properties;
+};
+
 module.exports = {
   addProperty,
   fetchPropertiesTenantId,
@@ -526,4 +545,5 @@ module.exports = {
   fetchPropertiesSlugs,
   fetchActiveProperties,
   getPropertyDetailService,
+  getHighlightedPropertiesService
 };
