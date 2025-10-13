@@ -13,7 +13,7 @@ const validateUser = require('../middlewares/validateUser');
 const router = express.Router();
 
 router.use('/tenants', tenantRouter);
-router.use('/auth', resolveTenant, authRouter);
+router.use('/auth', authRouter);
 router.use('/properties', resolveTenant, propertyRouter);
 router.use('/metrics', resolveTenant, metricRouter);
 router.use('/users', resolveTenant, validateUser, userRouter);

@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { User } = require("../../db/models");
+const { User, Tenant } = require("../../db/models");
 const AppError = require("../../utils/appError");
 const {
   generateToken,
@@ -24,13 +24,13 @@ const registerUser = async ({ name, email, password }) => {
   return newUser;
 };
 
-const loginUser = async ({ email, password }, tenantId) => {
+const loginUser = async ({ email, password }) => {
 
   if (!email || !password) {
     throw new AppError("Please provide email and password", 400);
   }
 
-  const user = await User.findOne({ where: { email , tenantId} });
+  const user = await User.findOne({ where: { email } });
 
   if (!user) {
     throw new AppError("Incorrect Credentials", 401);
@@ -42,9 +42,25 @@ const loginUser = async ({ email, password }, tenantId) => {
     throw new AppError("Incorrect Password", 401);
   }
 
+  if (!user.isValidated) {
+    throw new AppError("User not validated", 401);
+  }
+
+  const tenant = await Tenant.findByPk(user.tenantId);
+
+  if (!tenant) {
+    throw new AppError("Tenant not found", 404);
+  }
+
+  if (!tenant.active) {
+    throw new AppError("Tenant is inactive", 401);
+  }
+
   const token = generateToken({ id: user.id });
 
-  return { token };
+  const tenantId = tenant.id;
+
+  return { token, tenantId };
 };
 
 
