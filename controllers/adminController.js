@@ -1,10 +1,16 @@
+const { getPropertiesAdmin } = require("../services/admin/properties/admin.property.service");
 const catchAsync = require("../utils/catchAsync");
 
 const fetchPropertiesController = catchAsync(async (req, res) => {
-        const {user, tenant} = req;
+        const {tenant} = req;
         
-        console.log(user,'user', tenant, 'tenant');
+        const properties = await getPropertiesAdmin(tenant.id);
         
+        return res.status(200).json({
+            status: "success",
+            data: properties
+        })       
+
 });
 
 module.exports = {
