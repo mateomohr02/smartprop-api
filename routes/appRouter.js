@@ -6,6 +6,7 @@ const userRouter = require('./userRouter');
 const metricRouter = require('./metricRouter');
 const tenantRouter = require('./tenantRouter');
 const mpRouter = require('./mpRouter');
+const adminRouter = require('./adminRouter');
 const cloudinaryRouter = require('./cloudinaryRouter');
 const resolveTenant = require('../middlewares/resolveTenant');
 const validateUser = require('../middlewares/validateUser');
@@ -19,5 +20,5 @@ router.use('/metrics', resolveTenant, metricRouter);
 router.use('/users', resolveTenant, validateUser, userRouter);
 router.use('/mercado-pago', resolveTenant, validateUser, mpRouter);
 router.use('/cloudinary', resolveTenant, validateUser, cloudinaryRouter);
-
+router.use('/admin', resolveTenant, validateUser, adminRouter);
 module.exports = router;
