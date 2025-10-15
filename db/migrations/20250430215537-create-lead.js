@@ -25,6 +25,20 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      status: {
+        type: Sequelize.ENUM(
+          "new",
+          "seen",
+          "replied",
+          "dismissed"
+        ),
+        allowNull: false,
+        defaultValue: "new"
+      },
+      metadata: {
+        type: Sequelize.JSONB,
+        allowNull: true
+      },
       tenantId: {
         type: Sequelize.UUID,
         allowNull: false,

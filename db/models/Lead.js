@@ -25,6 +25,20 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      status: {
+        type: DataTypes.ENUM(
+          "new",
+          "seen",
+          "replied",
+          "dismissed"
+        ),
+        allowNull: false,
+        defaultValue: "new",
+      },
+      metadata: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+      },
       tenantId: {
         type: DataTypes.UUID,
         references: {
