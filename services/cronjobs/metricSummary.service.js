@@ -1,22 +1,27 @@
-const { Op } = require("sequelize");
+const { sequelize } = require("../../db/models");
 const dayjs = require("dayjs");
-const { EventMetric, MetricSummary } = require("../database/models");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+const { EventMetric, MetricSummary } = require("../../db/models");
+
+// Extender dayjs con plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const TZ = "America/Argentina/Buenos_Aires"; // zona horaria local
 
 const createMetricSummary = async () => {
   try {
-    // Calcular el rango del día anterior
-    const startOfYesterday = dayjs().subtract(1, "day").startOf("day").toDate();
-    const endOfYesterday = dayjs().subtract(1, "day").endOf("day").toDate();
+    // Fecha del día anterior (local)
+    const yesterdayStr = dayjs().tz(TZ).subtract(1, "day").format("YYYY-MM-DD");
+    console.log(`[MetricSummary] Generando resumen para ${yesterdayStr}`);
 
-    console.log(`[MetricSummary] Generando resumen para ${startOfYesterday.toISOString().split("T")[0]}`);
-
-    // Obtener los eventos del día anterior
+    // Obtener eventos del día anterior (según fecha local)
     const events = await EventMetric.findAll({
-      where: {
-        createdAt: {
-          [Op.between]: [startOfYesterday, endOfYesterday],
-        },
-      },
+      where: sequelize.where(
+        sequelize.fn("DATE", sequelize.col("createdAt")),
+        yesterdayStr
+      ),
       attributes: ["tenantId", "eventType"],
     });
 
@@ -28,26 +33,29 @@ const createMetricSummary = async () => {
     // Agrupar por tenantId y eventType
     const summaryMap = {};
     for (const e of events) {
-      const key = `${e.tenantId}-${e.eventType}`;
+      const key = `${e.tenantId}::${e.eventType}`; // separador seguro
       summaryMap[key] = (summaryMap[key] || 0) + 1;
     }
 
-    // Guardar o actualizar los registros
+    // Preparar registros para upsert
     const summaries = Object.entries(summaryMap).map(([key, count]) => {
-      const [tenantId, metric] = key.split("-");
+      const [tenantId, metric] = key.split("::");
       return {
         tenantId,
         metric,
-        date: dayjs(startOfYesterday).format("YYYY-MM-DD"),
+        date: yesterdayStr,
         count,
       };
     });
 
+    // Guardar o actualizar cada resumen
     for (const s of summaries) {
       await MetricSummary.upsert(s);
     }
 
-    console.log(`[MetricSummary] Resumen generado: ${summaries.length} métricas procesadas.`);
+    console.log(
+      `[MetricSummary] Resumen generado: ${summaries.length} métricas procesadas.`
+    );
   } catch (error) {
     console.error("[MetricSummary] Error al generar resumen:", error);
   }
