@@ -165,6 +165,13 @@ db.EventMetric.belongsTo(db.Post, { foreignKey: 'postId', onDelete: 'CASCADE' })
 db.Property.hasMany(db.EventMetric, { foreignKey: 'propertyId' });
 db.Post.hasMany(db.EventMetric, { foreignKey: 'postId' });
 
+// Tenant → EventSummary
+db.Tenant.hasMany(db.MetricSummary, {
+  foreignKey: "tenantId",
+  onDelete: "CASCADE",
+});
+db.MetricSummary.belongsTo(db.Tenant, { foreignKey: "tenantId" });
+
 /* Sequelize y exportación */
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
