@@ -1,5 +1,5 @@
 const { Op, fn, col, literal } = require("sequelize");
-const { MetricSummary, EventMetric } = require("../../../db/models");
+const { MetricSummary, Lead } = require("../../../db/models");
 
 const fetchDashboardMetrics = async (tenantId) => {
   // Fecha de corte: hoy menos 5 meses
@@ -53,19 +53,20 @@ const fetchDashboardMetrics = async (tenantId) => {
   return metrics;
 };
 
-const fetchConsults = async (tenantId) => {
-    const consults = await EventMetric.findAll({
-        where: {
-            tenantId,
-            eventType: "form_send"
-        },
-        }
-    )
+const fetchLeads = async (tenantId) => {
+    const leads = await Lead.findAll({
+      where: {
+        tenantId
+      },
+      order: [
+        ["createdAt", "DESC"]
+      ]
+});
 
-    return consults;
+    return leads;
 }
 
 module.exports = {
   fetchDashboardMetrics,
-  fetchConsults
+  fetchLeads
 };
