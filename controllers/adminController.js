@@ -5,6 +5,11 @@ const {
   fetchDashboardMetrics,
   fetchLeads,
 } = require("../services/admin/metrics/admin.metrics.service");
+
+const {
+  putLeadStatusService
+} = require("../services/admin/leads/admin.leads.service");
+
 const catchAsync = require("../utils/catchAsync");
 
 const fetchPropertiesController = catchAsync(async (req, res) => {
@@ -33,8 +38,34 @@ const fetchDashboardLeadsController = catchAsync(async (req, res) => {
   });
 });
 
+const putStatusLeadController = catchAsync(async (req, res) => {
+  const { leadId } = req.params;
+  const { status, metadata } = req.body;
+  const { tenant, user } = req;
+
+  if (!leadId) {
+    return res.status(400).json({
+      message: "No se envió el id de la consulta",
+    });
+  }
+
+  if (!status) {
+    return res.status(400).json({
+      message: "No se envió el estado de la consulta",
+    });
+  }
+
+  const lead = await putLeadStatusService(tenant.id, user, leadId, status, metadata);
+
+  return res.status(200).json({
+    status: "success",
+    data: lead,
+  });
+});
+
 module.exports = {
   fetchPropertiesController,
   fetchDashboardMetricsController,
-  fetchDashboardLeadsController
+  fetchDashboardLeadsController,
+  putStatusLeadController
 };
