@@ -52,6 +52,23 @@ const putLeadStatusService = async (tenantId, user, leadId, status, metadata = n
   return lead;
 };
 
+const getLead = async (tenantId, leadId) => {
+
+  const lead = await Lead.findOne({
+    where: {
+      tenantId,
+      id: leadId,
+    },
+  });
+
+  if (!lead) {
+    throw new Error("No se encontró la consulta");
+  }
+
+  return lead;
+
+}
 module.exports = {
-    putLeadStatusService
+    putLeadStatusService,
+    getLead
 }

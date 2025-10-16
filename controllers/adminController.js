@@ -7,7 +7,8 @@ const {
 } = require("../services/admin/metrics/admin.metrics.service");
 
 const {
-  putLeadStatusService
+  putLeadStatusService,
+  getLead
 } = require("../services/admin/leads/admin.leads.service");
 
 const catchAsync = require("../utils/catchAsync");
@@ -63,9 +64,29 @@ const putStatusLeadController = catchAsync(async (req, res) => {
   });
 });
 
+const fetchLeadDetailController = catchAsync(async (req, res) => {
+  const { leadId } = req.params;
+  const { tenant } = req;
+
+  if (!leadId || !tenant) {
+    return res.status(400).json({
+      message: "Faltan datos necesarios para obtener la consulta.",
+    });
+  }
+
+  const lead = await getLead(tenant.id, leadId);
+
+  return res.status(200).json({
+    status: "success",
+    data: lead,
+  });
+
+})
+
 module.exports = {
   fetchPropertiesController,
   fetchDashboardMetricsController,
   fetchDashboardLeadsController,
-  putStatusLeadController
+  putStatusLeadController,
+  fetchLeadDetailController
 };
