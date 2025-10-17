@@ -1,4 +1,4 @@
-const { fetchPropertiesController, fetchDashboardMetricsController, putStatusLeadController, fetchDashboardLeadsController, fetchLeadDetailController } = require('../controllers/adminController');
+const { fetchPropertiesController, fetchDashboardMetricsController, putStatusLeadController, fetchDashboardLeadsController, fetchLeadDetailController, putPropertyController } = require('../controllers/adminController');
 
 const router = require('express').Router();
 
@@ -12,5 +12,6 @@ router.route('/lead/:leadId').get(fetchLeadDetailController);
 
 router.route('/lead/:leadId').put(putStatusLeadController);
 
+router.route('/properties/edit').put(putPropertyController);
 
 module.exports = router;

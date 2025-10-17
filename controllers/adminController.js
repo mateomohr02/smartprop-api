@@ -1,5 +1,6 @@
 const {
   getPropertiesAdmin,
+  putProperty
 } = require("../services/admin/properties/admin.property.service");
 const {
   fetchDashboardMetrics,
@@ -83,10 +84,30 @@ const fetchLeadDetailController = catchAsync(async (req, res) => {
 
 })
 
+const putPropertyController = catchAsync(async (req, res) => {
+  const { tenant } = req;
+  const { body } = req;  
+
+  if (!tenant || !body) {
+      return res.status(400).json({
+      message: "Faltan datos necesarios para actualizar la propiedad",
+    });
+  }
+  
+
+  const propertyUpdated = await putProperty(tenant.id, body)  
+
+  return res.status(200).json({
+    status: "success",
+    data: propertyUpdated,
+  });
+
+})
 module.exports = {
   fetchPropertiesController,
   fetchDashboardMetricsController,
   fetchDashboardLeadsController,
   putStatusLeadController,
-  fetchLeadDetailController
+  fetchLeadDetailController,
+  putPropertyController
 };

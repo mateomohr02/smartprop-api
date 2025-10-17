@@ -16,10 +16,26 @@ const getPropertiesAdmin = async (tenantId) => {
     return properties;
 }
 
+const putProperty = async (tenantId, property) => {
+    console.log(tenantId, property, 'put Prop service');
+    
+    const { id, ...fieldsToUpdate } = property;
 
+    const propertyFound = await Property.findOne({
+      where: { id, tenantId },
+    });
+
+    if (!propertyFound) {
+      throw new AppError("No se encontró la propiedad", 404);
+    }
+
+    await propertyFound.update(fieldsToUpdate);
+
+    return propertyFound;
+}
 
 module.exports = {
-    getPropertiesAdmin
-
+    getPropertiesAdmin,
+    putProperty
 
 }
