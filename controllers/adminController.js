@@ -1,6 +1,7 @@
 const {
   getPropertiesAdmin,
-  putProperty
+  putProperty,
+  fetchPropertyTypes
 } = require("../services/admin/properties/admin.property.service");
 const {
   fetchDashboardMetrics,
@@ -9,7 +10,7 @@ const {
 
 const {
   putLeadStatusService,
-  getLead
+  getLead,
 } = require("../services/admin/leads/admin.leads.service");
 
 const catchAsync = require("../utils/catchAsync");
@@ -57,7 +58,13 @@ const putStatusLeadController = catchAsync(async (req, res) => {
     });
   }
 
-  const lead = await putLeadStatusService(tenant.id, user, leadId, status, metadata);
+  const lead = await putLeadStatusService(
+    tenant.id,
+    user,
+    leadId,
+    status,
+    metadata
+  );
 
   return res.status(200).json({
     status: "success",
@@ -81,33 +88,49 @@ const fetchLeadDetailController = catchAsync(async (req, res) => {
     status: "success",
     data: lead,
   });
-
-})
+});
 
 const putPropertyController = catchAsync(async (req, res) => {
   const { tenant } = req;
-  const { body } = req;  
+  const { body } = req;
 
   if (!tenant || !body) {
-      return res.status(400).json({
+    return res.status(400).json({
       message: "Faltan datos necesarios para actualizar la propiedad",
     });
   }
-  
 
-  const propertyUpdated = await putProperty(tenant.id, body)  
+  const propertyUpdated = await putProperty(tenant.id, body);
 
   return res.status(200).json({
     status: "success",
     data: propertyUpdated,
   });
+});
 
-})
+const fetchPopertyTypesController = catchAsync(async (req, res) => {
+  const { tenant } = req;
+
+  if (!tenant) {
+    return res.status(400).json({
+      message: "Faltan datos necesarios para realizar la petición",
+    });
+  }
+
+  const propertyTypes = await fetchPropertyTypes(tenant.id);
+
+  return res.status(200).json({
+    status: "success",
+    data: propertyTypes,
+  });
+});
+
 module.exports = {
+  fetchPopertyTypesController,
   fetchPropertiesController,
   fetchDashboardMetricsController,
   fetchDashboardLeadsController,
   putStatusLeadController,
   fetchLeadDetailController,
-  putPropertyController
+  putPropertyController,
 };
