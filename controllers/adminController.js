@@ -1,7 +1,7 @@
 const {
   getPropertiesAdmin,
   putProperty,
-  fetchPropertyTypes
+  fetchPropertyTypes,
 } = require("../services/admin/properties/admin.property.service");
 const {
   fetchDashboardMetrics,
@@ -14,6 +14,7 @@ const {
 } = require("../services/admin/leads/admin.leads.service");
 
 const catchAsync = require("../utils/catchAsync");
+const { fetchLocations } = require("../services/admin/location/admin.location.service");
 
 const fetchPropertiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
@@ -125,6 +126,19 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
   });
 });
 
+const fetchLocationsController = catchAsync(async (req, res) => {
+  const upperLocation = 
+    req.body && Object.keys(req.body).length > 0 ? req.body : null;
+
+  const locations = await fetchLocations(upperLocation);
+
+  return res.status(200).json({
+    status: "success",
+    data: locations,
+  });
+});
+
+
 module.exports = {
   fetchPopertyTypesController,
   fetchPropertiesController,
@@ -133,4 +147,5 @@ module.exports = {
   putStatusLeadController,
   fetchLeadDetailController,
   putPropertyController,
+  fetchLocationsController
 };

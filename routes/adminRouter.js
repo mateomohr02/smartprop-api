@@ -6,6 +6,7 @@ const {
   fetchLeadDetailController,
   putPropertyController,
   fetchPopertyTypesController,
+  fetchLocationsController,
 } = require("../controllers/adminController");
 
 const router = require("express").Router();
@@ -23,5 +24,7 @@ router.route("/lead/:leadId").put(putStatusLeadController);
 router.route("/properties/edit").put(putPropertyController);
 
 router.route("/properties/types").get(fetchPopertyTypesController);
+
+router.route("/locations").post(fetchLocationsController)
 
 module.exports = router;
