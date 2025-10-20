@@ -8,6 +8,7 @@ const {
   fetchPopertyTypesController,
   fetchLocationsController,
   parseMapLocation,
+  fetchComoditiesController,
 } = require("../controllers/adminController");
 
 const router = require("express").Router();
@@ -25,6 +26,8 @@ router.route("/lead/:leadId").put(putStatusLeadController);
 router.route("/properties/edit").put(putPropertyController);
 
 router.route("/properties/types").get(fetchPopertyTypesController);
+
+router.route("/properties/comodities").get(fetchComoditiesController);
 
 router.route("/locations").post(fetchLocationsController)
 

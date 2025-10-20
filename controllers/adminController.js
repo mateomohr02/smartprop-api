@@ -19,6 +19,10 @@ const {
   getLatLngFromGoogleMapsUrl,
 } = require("../services/admin/location/admin.location.service");
 
+const {
+  fetchComodities
+} = require("../services/admin/comodities/admin.comodities.service")
+
 const fetchPropertiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
@@ -142,10 +146,7 @@ const fetchLocationsController = catchAsync(async (req, res) => {
 });
 
 const parseMapLocation = catchAsync(async (req, res) => {
-  
-  console.log(req.body, 'body');
-  
-  
+    
   const { url } = req.body;
 
   const location = await getLatLngFromGoogleMapsUrl(url);
@@ -155,6 +156,27 @@ const parseMapLocation = catchAsync(async (req, res) => {
     data: location,
   });
 });
+
+const fetchComoditiesController = catchAsync( async (req, res) => {
+
+  const { tenant } = req;
+
+  if (!tenant) {
+    return res.status(400).json({
+      message: "Faltan datos necesarios para realizar la petición",
+    });
+  }
+
+  const comodites = await fetchComodities(tenant.id);
+
+  return res.status(200).json({
+    status: "success",
+    data: comodites,
+  });
+
+
+
+})
 
 module.exports = {
   fetchPopertyTypesController,
@@ -166,4 +188,5 @@ module.exports = {
   putPropertyController,
   fetchLocationsController,
   parseMapLocation,
+  fetchComoditiesController
 };
