@@ -14,7 +14,10 @@ const {
 } = require("../services/admin/leads/admin.leads.service");
 
 const catchAsync = require("../utils/catchAsync");
-const { fetchLocations } = require("../services/admin/location/admin.location.service");
+const {
+  fetchLocations,
+  getLatLngFromGoogleMapsUrl,
+} = require("../services/admin/location/admin.location.service");
 
 const fetchPropertiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
@@ -127,7 +130,7 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
 });
 
 const fetchLocationsController = catchAsync(async (req, res) => {
-  const upperLocation = 
+  const upperLocation =
     req.body && Object.keys(req.body).length > 0 ? req.body : null;
 
   const locations = await fetchLocations(upperLocation);
@@ -138,6 +141,20 @@ const fetchLocationsController = catchAsync(async (req, res) => {
   });
 });
 
+const parseMapLocation = catchAsync(async (req, res) => {
+  
+  console.log(req.body, 'body');
+  
+  
+  const { url } = req.body;
+
+  const location = await getLatLngFromGoogleMapsUrl(url);
+
+  return res.status(200).json({
+    status: "success",
+    data: location,
+  });
+});
 
 module.exports = {
   fetchPopertyTypesController,
@@ -147,5 +164,6 @@ module.exports = {
   putStatusLeadController,
   fetchLeadDetailController,
   putPropertyController,
-  fetchLocationsController
+  fetchLocationsController,
+  parseMapLocation,
 };
