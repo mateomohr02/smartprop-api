@@ -9,6 +9,7 @@ const {
   fetchLocationsController,
   parseMapLocation,
   fetchComoditiesController,
+  fetchCharacteristicsController,
 } = require("../controllers/adminController");
 
 const router = require("express").Router();
@@ -28,6 +29,9 @@ router.route("/properties/edit").put(putPropertyController);
 router.route("/properties/types").get(fetchPopertyTypesController);
 
 router.route("/properties/comodities").get(fetchComoditiesController);
+
+router.route("/properties/characteristics").get(fetchCharacteristicsController);
+
 
 router.route("/locations").post(fetchLocationsController)
 
