@@ -10,6 +10,7 @@ const {
   parseMapLocation,
   fetchComoditiesController,
   fetchCharacteristicsController,
+  fetchOtherRoomsController
 } = require("../controllers/adminController");
 
 const router = require("express").Router();
@@ -32,6 +33,7 @@ router.route("/properties/comodities").get(fetchComoditiesController);
 
 router.route("/properties/characteristics").get(fetchCharacteristicsController);
 
+router.route("/properties/rooms").get(fetchOtherRoomsController);
 
 router.route("/locations").post(fetchLocationsController)
 
