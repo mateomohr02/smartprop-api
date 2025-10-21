@@ -34,7 +34,7 @@ module.exports = {
         defaultValue: 1,
       },
       size: {
-        type: Sequelize.FLOAT, 
+        type: Sequelize.ARRAY(Sequelize.FLOAT), 
         allowNull: true,
       },
       tenantId: {

@@ -20,8 +20,6 @@ const fetchandCreateCharacteristics = async (
     },
   });
 
-  console.log(existingTenantCharacteristics, "existingTenantCharacteristics");
-
   const existingSlugToId = existingTenantCharacteristics.reduce(
     (acc, characteristic) => {
       acc[characteristic.slug] = characteristic.id;
@@ -30,11 +28,7 @@ const fetchandCreateCharacteristics = async (
     {}
   );
 
-  console.log(existingSlugToId, "existingSlugToId");
-
   const missingSlugs = slugs.filter((slug) => !existingSlugToId[slug]);
-
-  console.log(missingSlugs, "missingSlugs");
 
   const createdCharacteristics = await Promise.all(
     missingSlugs.map((slug) =>
@@ -46,8 +40,6 @@ const fetchandCreateCharacteristics = async (
     )
   );
 
-  console.log(createdCharacteristics, "createdCharacteristics");
-
   const createdSlugToId = createdCharacteristics.reduce(
     (acc, characteristic) => {
       acc[characteristic.slug] = characteristic.id;
@@ -56,11 +48,7 @@ const fetchandCreateCharacteristics = async (
     {}
   );
 
-  console.log(createdSlugToId, "createdSlugToId");
-
   const allSlugToId = { ...existingSlugToId, ...createdSlugToId };
-
-  console.log(allSlugToId, "allSlugToId");
 
   // Crear registros en PropertyCharacteristics
   const propertyCharacteristicsRecords = await Promise.all(
@@ -73,8 +61,6 @@ const fetchandCreateCharacteristics = async (
       });
     })
   );
-
-  console.log(propertyCharacteristicsRecords, "propertyCharacteristicsRecords");
 
   return propertyCharacteristicsRecords;
 };

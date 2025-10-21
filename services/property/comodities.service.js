@@ -4,56 +4,69 @@ const { nameFormatter, slugFormatter } = require("../../utils/stringFormatter");
 const AppError = require("../../utils/appError");
 
 const addPropertyComodities = async (comodities = [], propertyId, tenantId) => {
-  if (!comodities.length) return [];
+  try {
+    if (!comodities.length) return [];
 
-  const slugs = comodities.map((comodity) => comodity.comoditySlug);
+    // Estandarizamos los slugs
+    const formattedComodities = comodities.map((c) => ({
+      ...c,
+      comoditySlug: slugFormatter(c.comoditySlug),
+    }));
 
-  // Buscar las comodities existentes del tenant
-  const existingTenantComodities = await Comodity.findAll({
-    where: {
-      slug: slugs,
-      tenantId,
-    },
-  });
+    const slugs = formattedComodities.map((c) => c.comoditySlug);
 
-  const existingSlugToId = existingTenantComodities.reduce((acc, comodity) => {
-    acc[comodity.slug] = comodity.id;
-    return acc;
-  }, {});
-
-  const missingSlugs = slugs.filter((slug) => !existingSlugToId[slug]);
-
-  const createdComodities = await Promise.all(
-    missingSlugs.map((slug) =>
-      Comodity.create({
-        name: nameFormatter(slug),
-        slug: slugFormatter(slug),
+    // Buscar las comodities existentes del tenant
+    const existingTenantComodities = await Comodity.findAll({
+      where: {
+        slug: slugs,
         tenantId,
-      })
-    )
-  );
+      },
+    });
 
-  const createdSlugToId = createdComodities.reduce((acc, comodity) => {
-    acc[comodity.slug] = comodity.id;
-    return acc;
-  }, {});
+    const existingSlugToId = existingTenantComodities.reduce((acc, comodity) => {
+      acc[comodity.slug] = comodity.id;
+      return acc;
+    }, {});
 
-  const allSlugToId = { ...existingSlugToId, ...createdSlugToId };
+    // Detectar las que faltan crear
+    const missingSlugs = slugs.filter((slug) => !existingSlugToId[slug]);
 
-  // Crear registros en PropertyComodities
-  const propertyComoditiesRecords = await Promise.all(
-    comodities.map(({ comoditySlug }) =>
-      PropertyComodity.create({
-        propertyId,
-        comodityId: allSlugToId[comoditySlug],
-        tenantId,
-      })
-    )
-  );
+    const createdComodities = await Promise.all(
+      missingSlugs.map((slug) =>
+        Comodity.create({
+          name: nameFormatter(slug),
+          slug,
+          tenantId,
+        })
+      )
+    );
 
-  return propertyComoditiesRecords;
+    const createdSlugToId = createdComodities.reduce((acc, comodity) => {
+      acc[comodity.slug] = comodity.id;
+      return acc;
+    }, {});
+
+    const allSlugToId = { ...existingSlugToId, ...createdSlugToId };
+
+    // Crear registros en PropertyComodities
+    const propertyComoditiesRecords = await Promise.all(
+      formattedComodities.map(({ comoditySlug }) =>
+        PropertyComodity.create({
+          propertyId,
+          comodityId: allSlugToId[comoditySlug],
+          tenantId,
+        })
+      )
+    );
+
+    return propertyComoditiesRecords;
+  } catch (error) {
+    console.error("Error en addPropertyComodities:", error);
+    throw new AppError("Error al asociar comodities a la propiedad.", 500);
+  }
 };
 
 module.exports = {
   addPropertyComodities,
 };
+

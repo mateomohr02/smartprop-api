@@ -3,7 +3,7 @@ const { z } = require("zod");
 const roomSchema = z.object({
   roomSlug: z.string().min(4),
   value: z.number().min(1),
-  size: z.number().positive().optional(),
+  size: z.array(z.number().positive()).optional(),
 });
 
 const comoditySchema = z.object({

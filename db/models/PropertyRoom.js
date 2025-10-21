@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 1,
       },
       size: {
-        type: DataTypes.FLOAT, // opcional: metros cuadrados
+        type: DataTypes.ARRAY(DataTypes.FLOAT), //arreglo de floats -> indican los tamaños en caso de que hayan más de uno [10.5,5] serían mts2
         allowNull: true,
       },
       tenantId: {
