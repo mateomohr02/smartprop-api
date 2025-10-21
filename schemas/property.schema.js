@@ -26,7 +26,7 @@ const createPropertySchema = z.object({
   address: z.string().min(5),
   mapLocation: z.object({
     lat: z.string().min(2),
-    long: z.string().min(2),
+    lng: z.string().min(2),
   }),
   description: z.string().min(10),
   multimedia: z.object({

@@ -61,7 +61,7 @@ module.exports = {
         allowNull: false,
         defaultValue: {
           lat: "",
-          long: "",
+          lng: "",
         },
       },
       description: {

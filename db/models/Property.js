@@ -67,7 +67,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: {
           lat: "",
-          long: "",
+          lng: "",
         },
       },
       description: {
