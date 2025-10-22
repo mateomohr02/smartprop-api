@@ -35,6 +35,16 @@ const {
   uploadImagesInBatches
 } = require("../services/admin/cloudinary/admin.cloudinary.service");
 
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  secure: true,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
 const fetchPropertiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
@@ -220,31 +230,43 @@ const fetchOtherRoomsController = catchAsync(async (req, res) => {
 });
 
 const uploadMultimediaController = async (req, res) => {
-
   try {
     const { tenant } = req;
-    if (!tenant) {
-      return res
-        .status(400)
-        .json({ message: "Faltan datos necesarios para realizar la petición" });
-    }
+    if (!tenant)
+      return res.status(400).json({ message: "Faltan datos necesarios" });
 
-    if (!req.files || req.files.length === 0) {
+    if (!req.files || req.files.length === 0)
       return res.status(400).json({ message: "No se recibieron archivos" });
-    }
 
-    const filePaths = req.files.map((f) => f.path);
-    const uploaded = await uploadImagesInBatches(filePaths);
+    // Función helper que envuelve upload_stream en una Promesa
+    const uploadToCloudinary = (fileBuffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "auto" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+          }
+        );
+        stream.end(fileBuffer);
+      });
+    };
 
-    const urls = uploaded.map((item) => item.url);
-    return res.status(200).json({ urls });
+    // Subir todos los archivos simultáneamente
+    const uploaded = await Promise.all(
+      req.files.map((file) => uploadToCloudinary(file.buffer))
+    );
+
+    res.status(200).json({ urls: uploaded });
   } catch (error) {
     console.error("Error en uploadMultimediaController:", error);
-    res
-      .status(500)
-      .json({ message: "Error al subir multimedia", error: error.message });
+    res.status(500).json({
+      message: "Error al subir multimedia",
+      error: error.message,
+    });
   }
 };
+
 
 module.exports = {
   fetchPopertyTypesController,

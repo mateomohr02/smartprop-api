@@ -17,8 +17,8 @@ const {
 const router = require("express").Router();
 
 const multer = require("multer");
-
-const upload = multer({ dest: "tmp/" });
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 router.route("/properties").get(fetchPropertiesController);
 
