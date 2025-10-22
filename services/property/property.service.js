@@ -536,7 +536,21 @@ const getHighlightedPropertiesService = async (tenantId) => {
       ["heat", "DESC"],        
       ["createdAt", "DESC"],   
     ],
-    limit: 10
+    limit: 10,
+    include: [
+      {
+        model: PropertyType,
+        attributes: ["name"],
+      },
+      {
+        model: City,
+        attributes: ["name"],
+      },
+      {
+        model: Neighborhood,
+        attributes: ["name"],
+      },
+    ]
   });
 
   return properties;
