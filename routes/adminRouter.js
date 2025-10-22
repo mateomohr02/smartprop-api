@@ -10,10 +10,15 @@ const {
   parseMapLocation,
   fetchComoditiesController,
   fetchCharacteristicsController,
-  fetchOtherRoomsController
+  fetchOtherRoomsController,
+  uploadMultimediaController
 } = require("../controllers/adminController");
 
 const router = require("express").Router();
+
+const multer = require("multer");
+
+const upload = multer({ dest: "tmp/" });
 
 router.route("/properties").get(fetchPropertiesController);
 
@@ -38,5 +43,7 @@ router.route("/properties/rooms").get(fetchOtherRoomsController);
 router.route("/locations").post(fetchLocationsController)
 
 router.route("/location/parse").post(parseMapLocation);
+
+router.route("/properties/multimedia/upload").post(upload.array("files", 10), uploadMultimediaController)
 
 module.exports = router;

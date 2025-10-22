@@ -10,10 +10,10 @@ const addPropertyComodities = async (comodities = [], propertyId, tenantId) => {
     // Estandarizamos los slugs
     const formattedComodities = comodities.map((c) => ({
       ...c,
-      comoditySlug: slugFormatter(c.comoditySlug),
+      slug: slugFormatter(c.slug),
     }));
 
-    const slugs = formattedComodities.map((c) => c.comoditySlug);
+    const slugs = formattedComodities.map((c) => c.slug);
 
     // Buscar las comodities existentes del tenant
     const existingTenantComodities = await Comodity.findAll({

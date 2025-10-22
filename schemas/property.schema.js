@@ -7,37 +7,26 @@ const roomSchema = z.object({
 });
 
 const comoditySchema = z.object({
-  comoditySlug: z.string(),
+  slug: z.string(),
 });
 
 const characteristicSchema = z.object({
-  characteristicSlug: z.string(),
+  slug: z.string(),
 });
 
 const createPropertySchema = z.object({
-  title: z.string().min(20),
+  title: z.string().min(15),
+  propertyTypeSlug: z.string().min(2),
+  description: z.string().min(30),
+  operation: z.enum(["sale", "rent", "short-term"]),
   price: z.number().nonnegative().min(),
   priceFIAT: z.enum(["ARS", "USD", "EUR", "BRL"]),
-  expenses: z.number().nonnegative().optional(),
-  expensesFIAT: z.enum(["ARS", "USD", "BRL", "EUR"]).optional(),
-  operation: z.enum(["sale", "rent", "short-term"]),
+  expenses: z.number().nonnegative().nullable().optional(),
+  expensesFIAT: z.enum(["ARS", "USD", "BRL", "EUR"]).nullable().optional(),
   financing: z.string().optional(),
-  propertyTypeSlug: z.string().min(2),
-  address: z.string().min(5),
-  mapLocation: z.object({
-    lat: z.string().min(2),
-    lng: z.string().min(2),
-  }),
-  description: z.string().min(10),
   multimedia: z.object({
     images: z.array(z.string().url()),
-    video: z.string().url().optional(),
-  }),
-  place: z.object({
-    countryInput: z.string().min(4),
-    provinceInput: z.string().min(4),
-    cityInput: z.string().min(4),
-    neighborhoodInput: z.string().min(4),
+    video: z.array(z.string().url().optional()).optional()
   }),
   surface: z.object({
     covered: z.number().nonnegative(),
@@ -49,6 +38,17 @@ const createPropertySchema = z.object({
     gas: z.boolean(),
   }),
   condition: z.enum(["new", "like-new", "good", "to-renovate"]),
+  address: z.string().min(5),
+  mapLocation: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+  place: z.object({
+    countryInput: z.string().min(4),
+    provinceInput: z.string().min(4),
+    cityInput: z.string().min(4),
+    neighborhoodInput: z.string().min(4),
+  }),
   age: z.number().int().nonnegative(),
   availabilityType: z.enum(["inmediate", "date"]),
   availabilityDate: z.coerce.date().optional(),

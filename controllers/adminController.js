@@ -20,16 +20,20 @@ const {
 } = require("../services/admin/location/admin.location.service");
 
 const {
-  fetchComodities
-} = require("../services/admin/comodities/admin.comodities.service")
+  fetchComodities,
+} = require("../services/admin/comodities/admin.comodities.service");
 
 const {
-  fetchCharacteristics
-} = require("../services/admin/characteristics/admin.characteristics.service")
+  fetchCharacteristics,
+} = require("../services/admin/characteristics/admin.characteristics.service");
 
 const {
-  fetchOtherRooms
-} = require("../services/admin/rooms/admin.rooms.service")
+  fetchOtherRooms,
+} = require("../services/admin/rooms/admin.rooms.service");
+
+const {
+  uploadImagesInBatches
+} = require("../services/admin/cloudinary/admin.cloudinary.service");
 
 const fetchPropertiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
@@ -154,7 +158,6 @@ const fetchLocationsController = catchAsync(async (req, res) => {
 });
 
 const parseMapLocation = catchAsync(async (req, res) => {
-    
   const { url } = req.body;
 
   const location = await getLatLngFromGoogleMapsUrl(url);
@@ -165,8 +168,7 @@ const parseMapLocation = catchAsync(async (req, res) => {
   });
 });
 
-const fetchComoditiesController = catchAsync( async (req, res) => {
-
+const fetchComoditiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
@@ -183,8 +185,7 @@ const fetchComoditiesController = catchAsync( async (req, res) => {
   });
 });
 
-const fetchCharacteristicsController = catchAsync( async (req, res) => {
-
+const fetchCharacteristicsController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
@@ -199,12 +200,10 @@ const fetchCharacteristicsController = catchAsync( async (req, res) => {
     status: "success",
     data: characteristics,
   });
+});
 
-})
-
-const fetchOtherRoomsController = catchAsync( async (req, res) => {
-
-const { tenant } = req;
+const fetchOtherRoomsController = catchAsync(async (req, res) => {
+  const { tenant } = req;
 
   if (!tenant) {
     return res.status(400).json({
@@ -212,14 +211,40 @@ const { tenant } = req;
     });
   }
 
-const rooms = await fetchOtherRooms(tenant.id);
+  const rooms = await fetchOtherRooms(tenant.id);
 
-return res.status(200).json({
-  status: "success",
-  data: rooms
-})
+  return res.status(200).json({
+    status: "success",
+    data: rooms,
+  });
+});
 
-})
+const uploadMultimediaController = async (req, res) => {
+
+  try {
+    const { tenant } = req;
+    if (!tenant) {
+      return res
+        .status(400)
+        .json({ message: "Faltan datos necesarios para realizar la petición" });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No se recibieron archivos" });
+    }
+
+    const filePaths = req.files.map((f) => f.path);
+    const uploaded = await uploadImagesInBatches(filePaths);
+
+    const urls = uploaded.map((item) => item.url);
+    return res.status(200).json({ urls });
+  } catch (error) {
+    console.error("Error en uploadMultimediaController:", error);
+    res
+      .status(500)
+      .json({ message: "Error al subir multimedia", error: error.message });
+  }
+};
 
 module.exports = {
   fetchPopertyTypesController,
@@ -233,5 +258,6 @@ module.exports = {
   parseMapLocation,
   fetchComoditiesController,
   fetchCharacteristicsController,
-  fetchOtherRoomsController
+  fetchOtherRoomsController,
+  uploadMultimediaController,
 };

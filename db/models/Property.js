@@ -35,12 +35,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       expenses: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
       },
       expensesFIAT: {
         type: DataTypes.ENUM("ARS", "USD", "BRL", "EUR"),
-        allowNull: false,
         defaultValue: "ARS",
       },
       operation: {
