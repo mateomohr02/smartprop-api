@@ -11,7 +11,8 @@ const {
   fetchComoditiesController,
   fetchCharacteristicsController,
   fetchOtherRoomsController,
-  uploadMultimediaController
+  uploadMultimediaController,
+  fetchPropertyDetailController
 } = require("../controllers/adminController");
 
 const router = require("express").Router();
@@ -21,6 +22,8 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.route("/properties").get(fetchPropertiesController);
+
+router.route("/properties/:propertyId").get(fetchPropertyDetailController);
 
 router.route("/dashboard/metrics").get(fetchDashboardMetricsController);
 

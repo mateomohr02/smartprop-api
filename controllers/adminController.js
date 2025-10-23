@@ -2,6 +2,7 @@ const {
   getPropertiesAdmin,
   putProperty,
   fetchPropertyTypes,
+  getPropertyDetail
 } = require("../services/admin/properties/admin.property.service");
 const {
   fetchDashboardMetrics,
@@ -55,6 +56,24 @@ const fetchPropertiesController = catchAsync(async (req, res) => {
     data: properties,
   });
 });
+
+const fetchPropertyDetailController = catchAsync(async (req, res) => {
+  const { propertyId } = req.params;
+  const { tenant } = req;
+
+  if (!tenant || !propertyId) {
+    return res.status(400).json({
+      message: "Faltan datos necesarios para realizar la petición"
+    });
+  }
+  const propertyDetail = await getPropertyDetail(tenant.id, propertyId);
+
+  return res.status(200).json({
+    status: "success",
+    data: propertyDetail,
+  });
+});
+
 
 const fetchDashboardMetricsController = catchAsync(async (req, res) => {
   const { tenant } = req;
@@ -282,4 +301,5 @@ module.exports = {
   fetchCharacteristicsController,
   fetchOtherRoomsController,
   uploadMultimediaController,
+  fetchPropertyDetailController
 };
