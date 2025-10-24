@@ -23,7 +23,7 @@ const upload = multer({ storage });
 
 router.route("/properties").get(fetchPropertiesController);
 
-router.route("/properties/:propertyId").get(fetchPropertyDetailController);
+router.route("/properties/detail/:propertyId").get(fetchPropertyDetailController);
 
 router.route("/dashboard/metrics").get(fetchDashboardMetricsController);
 
