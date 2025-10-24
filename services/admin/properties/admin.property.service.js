@@ -1,5 +1,15 @@
 const AppError = require("../../../utils/appError");
-const { Property, PropertyType, City, Neighborhood, Comodity, Characteristic, Room  } = require("../../../db/models");
+const {
+  Property,
+  PropertyType,
+  City,
+  Province,
+  Country,
+  Neighborhood,
+  Comodity,
+  Characteristic,
+  Room,
+} = require("../../../db/models");
 
 const getPropertiesAdmin = async (tenantId) => {
   const properties = await Property.findAll({
@@ -21,21 +31,23 @@ const getPropertyDetail = async (tenantId, propertyId) => {
     include: [
       { model: PropertyType, attributes: ["name"] },
       { model: City, attributes: ["name"] },
+      { model: Province, attributes: ["name"] },
+      { model: Country, attributes: ["name"] },
       { model: Neighborhood, attributes: ["name"] },
       {
         model: Comodity,
         through: { attributes: [] },
-        attributes: ["name"],
+        attributes: ["name", "id"],
       },
       {
         model: Characteristic,
         through: { attributes: [] },
-        attributes: ["name"],
+        attributes: ["name", "id"],
       },
       {
         model: Room,
         through: { attributes: [] },
-        attributes: ["name"],
+        attributes: ["name", "id"],
       },
     ],
   });
@@ -44,9 +56,8 @@ const getPropertyDetail = async (tenantId, propertyId) => {
     throw new AppError("No property found", 404);
   }
 
-  return property
+  return property;
 };
-
 
 const putProperty = async (tenantId, property) => {
   console.log(tenantId, property, "put Prop service");
@@ -78,5 +89,5 @@ module.exports = {
   getPropertiesAdmin,
   putProperty,
   fetchPropertyTypes,
-  getPropertyDetail
+  getPropertyDetail,
 };
