@@ -1,5 +1,8 @@
 require('dotenv').config({ path: `${process.cwd()}/.env` });
+
+// CronJobs
 require("./cronjobs/metricSummary.cron");
+require("./cronjobs/propertyDailyStat.cron");
 
 const express = require('express');
 const morgan = require('morgan');

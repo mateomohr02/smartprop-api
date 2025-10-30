@@ -13,15 +13,15 @@ const createPropertyDailyStat = async () => {
   try {
     // Fecha del día anterior (local)
     const yesterday = dayjs().tz(TZ).subtract(1, "day");
-    const day = yesterday.date();
-    const month = yesterday.month() + 1; // month() devuelve 0-11
-    const year = yesterday.year();
+    const day = 29//yesterday.date();
+    const month = 10//yesterday.month() + 1; // month() devuelve 0-11
+    const year = 2025//yesterday.year();
 
     console.log(`[PropertyDailyStat] Generando registros para ${yesterday.format("YYYY-MM-DD")}`);
 
     // Obtener todas las propiedades
     const properties = await Property.findAll({
-      attributes: ["id"]
+      attributes: ["id", "heat", "visualizations", "interactions", "reach"],
     });
 
     if (!properties.length) {
@@ -35,10 +35,10 @@ const createPropertyDailyStat = async () => {
       day,
       month,
       year,
-      visualizations: 0,
-      interactions: 0,
-      reach: 0,
-      heat: 0
+      visualizations: p.visualizations,
+      interactions: p.interactions,
+      reach: p.reach,
+      heat: p.heat,
     }));
 
     // Guardar todos de golpe
