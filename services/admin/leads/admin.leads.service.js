@@ -1,8 +1,9 @@
 const { Lead } = require("../../../db/models");
+const AppError = require("../../../utils/appError");
 
 const putLeadStatusService = async (tenantId, user, leadId, status, metadata = null) => {
   if (!tenantId || !user || !leadId || !status) {
-    throw new Error("Faltan datos necesarios para actualizar la consulta");
+    throw new AppError("Faltan datos necesarios para actualizar la consulta");
   }
 
   const lead = await Lead.findOne({
@@ -13,7 +14,7 @@ const putLeadStatusService = async (tenantId, user, leadId, status, metadata = n
   });
 
   if (!lead) {
-    throw new Error("No se encontró la consulta");
+    throw new AppError("No se encontró la consulta");
   }
 
   // Normalizamos el objeto metadata actual (por si no existe)
@@ -43,7 +44,7 @@ const putLeadStatusService = async (tenantId, user, leadId, status, metadata = n
       break;
 
     default:
-      throw new Error(`Estado no válido: ${status}`);
+      throw new AppError(`Estado no válido: ${status}`);
   }
 
   lead.metadata = currentMetadata;
@@ -62,7 +63,7 @@ const fetchLeadDetail = async (tenantId, leadId) => {
   });
 
   if (!lead) {
-    throw new Error("No se encontró la consulta");
+    throw new AppError("No se encontró la consulta");
   }
 
   return lead;
