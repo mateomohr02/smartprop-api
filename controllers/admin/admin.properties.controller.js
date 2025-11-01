@@ -23,7 +23,7 @@ const fetchPropertiesController = catchAsync(async (req, res) => {
 
   return res.status(200).json({
     status: "success",
-    data: properties,
+    properties,
   });
 });
 
@@ -32,16 +32,13 @@ const fetchPropertyDetailController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant || !propertyId) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para realizar la petición",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
   const propertyDetail = await getPropertyDetail(tenant.id, propertyId);
 
   return res.status(200).json({
     status: "success",
-    data: propertyDetail,
+    propertyDetail,
   });
 });
 
@@ -50,17 +47,14 @@ const putPropertyController = catchAsync(async (req, res) => {
   const { body } = req;
 
   if (!tenant || !body) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para actualizar la propiedad",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   const propertyUpdated = await putProperty(tenant.id, body);
 
   return res.status(200).json({
     status: "success",
-    data: propertyUpdated,
+    propertyUpdated,
   });
 });
 
@@ -68,17 +62,14 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para realizar la petición",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   const propertyTypes = await fetchPropertyTypes(tenant.id);
 
   return res.status(200).json({
     status: "success",
-    data: propertyTypes,
+    propertyTypes,
   });
 });
 
@@ -86,16 +77,10 @@ const uploadMultimediaController = async (req, res) => {
   try {
     const { tenant } = req;
     if (!tenant)
-      return res.status(400).json({
-        status: "failure",
-        message: "Faltan datos necesarios",
-      });
+      return next(new AppError("Missing data for request."), 400)
 
     if (!req.files || req.files.length === 0)
-      return res.status(400).json({
-        status: "failure",
-        message: "No se recibieron archivos",
-      });
+      return next(new AppError("Missing files."), 400)
 
     // Función helper que envuelve upload_stream en una Promesa
     const uploadToCloudinary = (fileBuffer) => {
@@ -118,11 +103,7 @@ const uploadMultimediaController = async (req, res) => {
 
     res.status(200).json({ urls: uploaded });
   } catch (error) {
-    console.error("Error en uploadMultimediaController:", error);
-    res.status(500).json({
-      status: "failure",
-      message: "Error al subir multimedia",
-    });
+    return next(new AppError("Error while uploading multimedia."), 500)
   }
 };
 

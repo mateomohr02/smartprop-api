@@ -11,10 +11,7 @@ const handlePreference = async (req, res) => {
     const { title, unit_price, quantity, courseId } = req.body;
 
     if (!title || !unit_price || !quantity) {
-      return res.status(400).json({
-        status: "failure",
-        error: "Faltan datos en la solicitud",
-      });
+      return next(new AppError("Missing data for request."), 400)
     }
 
     const preference = new Preference(client);
@@ -57,11 +54,7 @@ const handlePreference = async (req, res) => {
       status: "success",
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      error: error.message,
-      status: "fail",
-    });
+    return next(new AppError("Fail"), 500)
   }
 };
 

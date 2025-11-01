@@ -9,10 +9,7 @@ const fetchComoditiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para realizar la petición",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   const comodites = await fetchComodities(tenant.id);

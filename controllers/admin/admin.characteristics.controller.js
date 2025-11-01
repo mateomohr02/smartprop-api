@@ -1,4 +1,5 @@
 const catchAsync = require("../../utils/catchAsync");
+const AppError = require("../../utils/appError");
 
 const {
   fetchCharacteristics,
@@ -8,10 +9,7 @@ const fetchCharacteristicsController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para realizar la petición",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   const characteristics = await fetchCharacteristics(tenant.id);

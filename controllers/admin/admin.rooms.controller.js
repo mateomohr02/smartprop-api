@@ -8,17 +8,14 @@ const fetchOtherRoomsController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
-    return res.status(400).json({
-       status: "failure",
-      message: "Faltan datos necesarios para realizar la petición",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   const rooms = await fetchOtherRooms(tenant.id);
 
   return res.status(200).json({
     status: "success",
-    data: rooms,
+    rooms,
   });
 });
 

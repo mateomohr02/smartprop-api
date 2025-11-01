@@ -11,7 +11,7 @@ const fetchLeadsController = catchAsync(async (req, res) => {
   const leads = await fetchLeads(tenant.id);
   return res.status(200).json({
     status: "success",
-    data: leads,
+    leads,
   });
 });
 
@@ -20,17 +20,14 @@ const fetchLeadDetailController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!leadId || !tenant) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para obtener la consulta.",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   const lead = await fetchLeadDetail(tenant.id, leadId);
 
   return res.status(200).json({
     status: "success",
-    data: lead,
+    lead,
   });
 });
 
@@ -40,17 +37,11 @@ const putLeadStatusController = catchAsync(async (req, res) => {
   const { tenant, user } = req;
 
   if (!leadId) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para realizar la petición",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   if (!status) {
-    return res.status(400).json({
-      status: "failure",
-      message: "Faltan datos necesarios para realizar la petición",
-    });
+    return next(new AppError("Missing data for request."), 400)
   }
 
   const lead = await putLeadStatusService(
@@ -63,7 +54,7 @@ const putLeadStatusController = catchAsync(async (req, res) => {
 
   return res.status(200).json({
     status: "success",
-    data: lead,
+    lead,
   });
 });
 

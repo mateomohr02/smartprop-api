@@ -13,7 +13,7 @@ const parseMapLocation = catchAsync(async (req, res) => {
 
   return res.status(200).json({
     status: "success",
-    data: location,
+    location,
   });
 });
 
@@ -26,7 +26,7 @@ const fetchPlacesController = catchAsync(async (req, res) => {
 
   return res.status(200).json({
     status: "success",
-    data: locations,
+    locations,
   });
 });
 

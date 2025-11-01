@@ -58,11 +58,7 @@ const getPropertiesFiltered = catchAsync(async (req, res) => {
   );
 
   if (errors && errors.length > 0) {
-    return res.status(400).json({
-      status: "error",
-      message: "Hubo errores en los filtros",
-      errors,
-    });
+    return next(new AppError("Errors with filters."), 400)
   }
 
   const properties = await searchPropertiesService(filters, tenantId);

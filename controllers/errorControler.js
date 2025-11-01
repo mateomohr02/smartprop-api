@@ -17,7 +17,6 @@ const sendErrorProd = (err, res) => {
     });
   }
 
-  // Error no esperado: no se expone el mensaje original
   console.error("ERROR 💥:", err);
 
   return res.status(500).json({

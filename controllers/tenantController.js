@@ -18,7 +18,7 @@ const findTenantById = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    data: tenant,
+    tenant,
   });
 });
 
@@ -47,7 +47,7 @@ const addMetricsID = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    data: updatedTenant,
+    updatedTenant,
   });
 
 })
