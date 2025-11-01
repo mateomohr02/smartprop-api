@@ -525,7 +525,7 @@ const getPropertyDetailService = async (propertySlug, tenantId) => {
 const getHighlightedPropertiesService = async (tenantId) => {
   
   if (!tenantId) {
-    throw new Error("Tenant ID is required");
+    throw new AppError("Tenant ID is required");
   }
 
 

@@ -1,3 +1,4 @@
+const AppError = require("../../utils/appError");
 const { sequelize } = require("../../db/models");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
