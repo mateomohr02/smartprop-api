@@ -1,52 +1,19 @@
-const {
-  fetchPropertiesController,
-  fetchDashboardMetricsController,
-  putStatusLeadController,
-  fetchDashboardLeadsController,
-  fetchLeadDetailController,
-  putPropertyController,
-  fetchPopertyTypesController,
-  fetchLocationsController,
-  parseMapLocation,
-  fetchComoditiesController,
-  fetchCharacteristicsController,
-  fetchOtherRoomsController,
-  uploadMultimediaController,
-  fetchPropertyDetailController
-} = require("../controllers/adminController");
+const adminPropertiesRouter = require("./admin/admin.properties.routes");
+const adminComoditesRotuer = require("./admin/admin.comodities.routes");
+const adminCharacteristicsRouter = require("./admin/admin.characteristics.routes");
+const adminPlacesRouter = require("./admin/admin.places.routes");
+const adminMetricsRouter = require("./admin/admin.metrics.routes");
+const adminLeadsRouter = require("./admin/admin.leads.routes");
+const adminRoomsRouter = require("./admin/admin.rooms.route");
 
 const router = require("express").Router();
 
-const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-router.route("/properties").get(fetchPropertiesController);
-
-router.route("/properties/detail/:propertyId").get(fetchPropertyDetailController);
-
-router.route("/dashboard/metrics").get(fetchDashboardMetricsController);
-
-router.route("/dashboard/leads").get(fetchDashboardLeadsController);
-
-router.route("/lead/:leadId").get(fetchLeadDetailController);
-
-router.route("/lead/:leadId").put(putStatusLeadController);
-
-router.route("/properties/edit").put(putPropertyController);
-
-router.route("/properties/types").get(fetchPopertyTypesController);
-
-router.route("/properties/comodities").get(fetchComoditiesController);
-
-router.route("/properties/characteristics").get(fetchCharacteristicsController);
-
-router.route("/properties/rooms").get(fetchOtherRoomsController);
-
-router.route("/locations").post(fetchLocationsController)
-
-router.route("/location/parse").post(parseMapLocation);
-
-router.route("/properties/multimedia/upload").post(upload.array("files", 10), uploadMultimediaController)
+router.use("/properties", adminPropertiesRouter);
+router.use("/comodities", adminComoditesRotuer);
+router.use("/characteristics", adminCharacteristicsRouter);
+router.use("/places", adminPlacesRouter);
+router.use("/metrics", adminMetricsRouter);
+router.use("/leads", adminLeadsRouter);
+router.use("/rooms", adminRoomsRouter);
 
 module.exports = router;

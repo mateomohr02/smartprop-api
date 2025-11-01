@@ -52,7 +52,7 @@ const putLeadStatusService = async (tenantId, user, leadId, status, metadata = n
   return lead;
 };
 
-const getLead = async (tenantId, leadId) => {
+const fetchLeadDetail = async (tenantId, leadId) => {
 
   const lead = await Lead.findOne({
     where: {
@@ -68,7 +68,22 @@ const getLead = async (tenantId, leadId) => {
   return lead;
 
 }
+
+const fetchLeads = async (tenantId) => {
+    const leads = await Lead.findAll({
+      where: {
+        tenantId
+      },
+      order: [
+        ["createdAt", "DESC"]
+      ]
+});
+
+    return leads;
+}
+
 module.exports = {
     putLeadStatusService,
-    getLead
+    fetchLeadDetail,
+    fetchLeads
 }

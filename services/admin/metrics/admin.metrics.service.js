@@ -53,20 +53,8 @@ const fetchDashboardMetrics = async (tenantId) => {
   return metrics;
 };
 
-const fetchLeads = async (tenantId) => {
-    const leads = await Lead.findAll({
-      where: {
-        tenantId
-      },
-      order: [
-        ["createdAt", "DESC"]
-      ]
-});
 
-    return leads;
-}
 
 module.exports = {
-  fetchDashboardMetrics,
-  fetchLeads
+  fetchDashboardMetrics
 };
