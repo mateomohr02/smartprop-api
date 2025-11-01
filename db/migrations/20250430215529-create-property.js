@@ -3,6 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable("Properties", {
+      // 1️⃣ INICIALIZACIÓN
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -13,31 +14,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      slug: {
-        type: Sequelize.STRING,
+      description: {
+        type: Sequelize.TEXT,
         allowNull: false,
       },
-      price: {
-        type: Sequelize.INTEGER,
+      status: {
+        type: Sequelize.ENUM("draft", "published", "archived"),
+        defaultValue: "draft",
         allowNull: false,
-      },
-      priceFIAT: {
-        type: Sequelize.ENUM('ARS', 'USD', 'BRL', 'EUR'),
-        allowNull: false,
-      },
-      expenses: {
-        type: Sequelize.INTEGER,
-      },
-      expensesFIAT: {
-        type: Sequelize.ENUM('ARS', 'USD', 'BRL', 'EUR'),
-        defaultValue: 'ARS'
-      },
-      operation: {
-        type: Sequelize.ENUM("sale", "rent", "short-term"),
-        allowNull: false,
-      },
-      financing: {
-        type: Sequelize.STRING,
       },
       propertyTypeId: {
         type: Sequelize.UUID,
@@ -49,126 +33,159 @@ module.exports = {
         onUpdate: "CASCADE",
         onDelete: "RESTRICT",
       },
-      address: {
+      tenantId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: "Tenants",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+
+      // 2️⃣ DATOS DE LA PROPIEDAD
+      price: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      priceFIAT: {
+        type: Sequelize.ENUM("ARS", "USD", "EUR", "BRL"),
+        allowNull: true,
+      },
+      expenses: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      expensesFIAT: {
+        type: Sequelize.ENUM("ARS", "USD", "EUR", "BRL"),
+        allowNull: true,
+      },
+      operation: {
+        type: Sequelize.ENUM("sale", "rent", "short-term"),
+        allowNull: true,
+      },
+      financing: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      mapLocation: {
-        type: Sequelize.JSONB,
-        allowNull: false,
-        defaultValue: {
-          lat: "",
-          lng: "",
-        },
-      },
-      description: {
-        type: Sequelize.TEXT,
-        allowNull: false,
-      },
-      multimedia: {
-        type: Sequelize.JSONB,
-        allowNull: false,
-      },
-      countryId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: "Countries",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "RESTRICT",
-      },
-      provinceId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: "Provinces",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "RESTRICT",
-      },
-      cityId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: "Cities",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "RESTRICT",
-      },
-      neighborhoodId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: "Neighborhoods",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "RESTRICT",
+        allowNull: true,
       },
       rooms: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
+        allowNull: true,
       },
       bedrooms: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
+        allowNull: true,
       },
       bathrooms: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0, 
+        allowNull: true,
       },
       garages: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+        allowNull: true,
       },
       surface: {
         type: Sequelize.JSONB,
         allowNull: false,
         defaultValue: {
-          covered: "",
-          total: "",
+          covered: null,
+          total: null,
         },
       },
       services: {
         type: Sequelize.JSONB,
-        allowNull:false,
-       defaultValue: {
-        light: true,
-        water: true,
-        gas: true
-       }
+        allowNull: false,
+        defaultValue: {
+          light: true,
+          water: true,
+          gas: true,
+        },
       },
       condition: {
         type: Sequelize.ENUM("new", "like-new", "good", "to-renovate"),
-        allowNull: false,
+        allowNull: true,
       },
       age: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       availabilityType: {
         type: Sequelize.ENUM("inmediate", "date"),
-        allowNull: false,
+        allowNull: true,
       },
       availabilityDate: {
         type: Sequelize.DATE,
-        defaultValue: new Date()
+        allowNull: true,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
-      
+
+      // 3️⃣ UBICACIÓN
+      address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      mapLocation: {
+        type: Sequelize.JSONB,
+        allowNull: true,
+        defaultValue: {
+          lat: "",
+          lng: "",
+        },
+      },
+      countryId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: "Countries",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      provinceId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: "Provinces",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      cityId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: "Cities",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+      neighborhoodId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: "Neighborhoods",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "SET NULL",
+      },
+
+      // 4️⃣ MULTIMEDIA
+      multimedia: {
+        type: Sequelize.JSONB,
+        allowNull: true,
+      },
+
+      // 8️⃣ PUBLICACIÓN Y MÉTRICAS
       isActive: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
-      
       isFeatured: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
@@ -189,16 +206,12 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
-      tenantId: {
-        type: Sequelize.UUID,
-        allowNull: false,
-        references: {
-          model: "Tenants",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
+      slug: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
+
+      // TIMESTAMPS
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -212,12 +225,25 @@ module.exports = {
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable("Properties");
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_priceFIAT";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_expensesFIAT";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_operation";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_condition";');
-    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Properties_availabilityType";');
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Properties_status";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Properties_priceFIAT";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Properties_expensesFIAT";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Properties_operation";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Properties_condition";'
+    );
+    await queryInterface.sequelize.query(
+      'DROP TYPE IF EXISTS "enum_Properties_availabilityType";'
+    );
   },
 };

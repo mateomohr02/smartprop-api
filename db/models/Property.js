@@ -3,14 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const Property = sequelize.define(
     "Property",
     {
-      //PropertyRoom tabla intermedia de los ambientes y tipos de ambientes de la propiedad
-      //PropertyComodity tabla intermedia de las comunidades del la propiedad.
-      //PropertyCharacteristic tabla intermedia que almacena las referencias de las características de la propiedad.
-      //Characteristic son adjetivos que describen a la propiedad: "luminoso", "acepta mascotas", "amoblado", etc...
-      //Room modelo que describe los tipos de habitaciones de la propiedad: "Quincho", "Living", "Comedor"
-      //PropertyType indica el tipo de Inmueble: "Casa", "Departamento,"PH", etc...
-
-      //DATOS IMPORTANTES
+      //INICIALIZACIÓN
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -21,31 +14,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      slug: {
-        type: DataTypes.STRING,
+      description: {
+        type: DataTypes.TEXT,
         allowNull: false,
       },
-      price: {
-        type: DataTypes.INTEGER,
+      status: {
+        type: DataTypes.ENUM("draft", "published", "archived"),
+        defaultValue: "draft",
         allowNull: false,
-      },
-      priceFIAT: {
-        type: DataTypes.ENUM("ARS", "USD", "EUR", "BRL"),
-        allowNull: false,
-      },
-      expenses: {
-        type: DataTypes.INTEGER,
-      },
-      expensesFIAT: {
-        type: DataTypes.ENUM("ARS", "USD", "BRL", "EUR"),
-        defaultValue: "ARS",
-      },
-      operation: {
-        type: DataTypes.ENUM("sale", "rent", "short-term"),
-        allowNull: false,
-      },
-      financing: {
-        type: DataTypes.STRING,
       },
       propertyTypeId: {
         type: DataTypes.UUID,
@@ -55,86 +31,63 @@ module.exports = (sequelize, DataTypes) => {
         },
         allowNull: false,
       },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      mapLocation: {
-        type: DataTypes.JSONB,
-        allowNull: false,
-        defaultValue: {
-          lat: "",
-          lng: "",
-        },
-      },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-      },
-      multimedia: {
-        type: DataTypes.JSONB,
-        allowNull: false,
-      },
-      countryId: {
+      tenantId: {
         type: DataTypes.UUID,
         references: {
-          model: "country",
+          model: "tenant",
           key: "id",
         },
         allowNull: false,
-      },
-      provinceId: {
-        type: DataTypes.UUID,
-        references: {
-          model: "province",
-          key: "id",
-        },
-        allowNull: false,
-      },
-      cityId: {
-        type: DataTypes.UUID,
-        references: {
-          model: "city",
-          key: "id",
-        },
-        allowNull: false,
-      },
-      neighborhoodId: {
-        type: DataTypes.UUID,
-        references: {
-          model: "neighborhood",
-          key: "id",
-        },
-        allowNull: false,
+        onDelete: "CASCADE",
       },
 
-      //DATOS DESCRIPTIVOS
+      //2 PASO: GUARDANDO DATOS DE LA PROPIEDAD
+      price: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      priceFIAT: {
+        type: DataTypes.ENUM("ARS", "USD", "EUR", "BRL"),
+        allowNull: true,
+      },
+      expenses: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      expensesFIAT: {
+        type: DataTypes.ENUM("ARS", "USD", "EUR", "BRL"),
+        allowNull: true,
+      },
+      operation: {
+        type: DataTypes.ENUM("sale", "rent", "short-term"),
+        allowNull: true,
+      },
+      financing: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       rooms: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+        allowNull: true,
       },
       bedrooms: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+        allowNull: true,
       },
       bathrooms: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0 
+        allowNull: true,
       },
       garages: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+        allowNull: true,
       },
       surface: {
         type: DataTypes.JSONB,
         allowNull: false,
         defaultValue: {
-          covered: "",
-          total: "",
+          covered: null,
+          total: null,
         },
       },
       services: {
@@ -148,20 +101,81 @@ module.exports = (sequelize, DataTypes) => {
       },
       condition: {
         type: DataTypes.ENUM("new", "like-new", "good", "to-renovate"),
-        allowNull: false,
+        allowNull: true,
       },
       age: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
       availabilityType: {
         type: DataTypes.ENUM("inmediate", "date"),
-        allowNull: false,
+        allowNull: true,
       },
       availabilityDate: {
         type: DataTypes.DATE,
-        defaultValue: new Date()
+        defaultValue: DataTypes.NOW,
+        allowNull: true,
       },
+
+      //3 PASO: GUARDANDO UBICACIÓN
+      address: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      mapLocation: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        defaultValue: {
+          lat: "",
+          lng: "",
+        },
+      },
+      countryId: {
+        type: DataTypes.UUID,
+        references: {
+          model: "country",
+          key: "id",
+        },
+        allowNull: true,
+      },
+      provinceId: {
+        type: DataTypes.UUID,
+        references: {
+          model: "province",
+          key: "id",
+        },
+        allowNull: true,
+      },
+      cityId: {
+        type: DataTypes.UUID,
+        references: {
+          model: "city",
+          key: "id",
+        },
+        allowNull: true,
+      },
+      neighborhoodId: {
+        type: DataTypes.UUID,
+        references: {
+          model: "neighborhood",
+          key: "id",
+        },
+        allowNull: true,
+      },
+
+      //4 PASO: AÑADIENDO MULTIMEDIA
+      multimedia: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+      },
+
+      //5 PASO: AÑADIENDO CARACTERÍSTICAS
+
+      //6 PASO: AÑADIENDO COMODIDADES
+
+      //7 PASO: AÑADIENDO INFORMACIÓN DE LOS AMBIENTES
+
+      //8 PASO: PUBLICAR
 
       //MÉTRICAS / MUESTRA AL PÚBLICO
       isActive: {
@@ -191,15 +205,9 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
 
-      //PROPIETARIO
-      tenantId: {
-        type: DataTypes.UUID,
-        references: {
-          model: "tenant",
-          key: "id",
-        },
-        allowNull: false,
-        onDelete: "CASCADE",
+      slug: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     { timestamps: true }
