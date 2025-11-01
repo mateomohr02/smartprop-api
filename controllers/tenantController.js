@@ -8,7 +8,6 @@ const createTenant = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: "success",
-    message: "Tenant & First User created successfully.",
     data: { tenant, firstUser },
   });
 });
@@ -19,7 +18,6 @@ const findTenantById = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    message: "Tenant found",
     data: tenant,
   });
 });
@@ -32,9 +30,7 @@ const setInactive = catchAsync(async (req, res, next) => {
   const updatedTenant = await setInactiveTenant({ tenantId, userId, tenantIdParams });
 
   res.status(200).json({
-    status: "success",
-    message: "Tenant set as inactive",
-    data: true,
+    status: "success"
   });
 });
 
@@ -51,7 +47,6 @@ const addMetricsID = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    message: "Metrics IDs updated successfully",
     data: updatedTenant,
   });
 

@@ -21,6 +21,7 @@ const fetchLeadDetailController = catchAsync(async (req, res) => {
 
   if (!leadId || !tenant) {
     return res.status(400).json({
+      status: "failure",
       message: "Faltan datos necesarios para obtener la consulta.",
     });
   }
@@ -40,13 +41,15 @@ const putLeadStatusController = catchAsync(async (req, res) => {
 
   if (!leadId) {
     return res.status(400).json({
-      message: "No se envió el id de la consulta",
+      status: "failure",
+      message: "Faltan datos necesarios para realizar la petición",
     });
   }
 
   if (!status) {
     return res.status(400).json({
-      message: "No se envió el estado de la consulta",
+      status: "failure",
+      message: "Faltan datos necesarios para realizar la petición",
     });
   }
 

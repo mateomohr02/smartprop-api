@@ -33,6 +33,7 @@ const fetchPropertyDetailController = catchAsync(async (req, res) => {
 
   if (!tenant || !propertyId) {
     return res.status(400).json({
+      status: "failure",
       message: "Faltan datos necesarios para realizar la petición",
     });
   }
@@ -50,6 +51,7 @@ const putPropertyController = catchAsync(async (req, res) => {
 
   if (!tenant || !body) {
     return res.status(400).json({
+      status: "failure",
       message: "Faltan datos necesarios para actualizar la propiedad",
     });
   }
@@ -67,6 +69,7 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
 
   if (!tenant) {
     return res.status(400).json({
+      status: "failure",
       message: "Faltan datos necesarios para realizar la petición",
     });
   }
@@ -83,10 +86,16 @@ const uploadMultimediaController = async (req, res) => {
   try {
     const { tenant } = req;
     if (!tenant)
-      return res.status(400).json({ message: "Faltan datos necesarios" });
+      return res.status(400).json({
+        status: "failure",
+        message: "Faltan datos necesarios",
+      });
 
     if (!req.files || req.files.length === 0)
-      return res.status(400).json({ message: "No se recibieron archivos" });
+      return res.status(400).json({
+        status: "failure",
+        message: "No se recibieron archivos",
+      });
 
     // Función helper que envuelve upload_stream en una Promesa
     const uploadToCloudinary = (fileBuffer) => {
@@ -111,8 +120,8 @@ const uploadMultimediaController = async (req, res) => {
   } catch (error) {
     console.error("Error en uploadMultimediaController:", error);
     res.status(500).json({
+      status: "failure",
       message: "Error al subir multimedia",
-      error: error.message,
     });
   }
 };

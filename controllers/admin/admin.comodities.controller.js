@@ -10,6 +10,7 @@ const fetchComoditiesController = catchAsync(async (req, res) => {
 
   if (!tenant) {
     return res.status(400).json({
+      status: "failure",
       message: "Faltan datos necesarios para realizar la petición",
     });
   }

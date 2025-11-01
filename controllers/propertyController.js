@@ -8,7 +8,7 @@ const {
   fetchActiveProperties,
   getPropertyDetailService,
   searchPropertiesService,
-  getHighlightedPropertiesService
+  getHighlightedPropertiesService,
 } = require("../services/property/property.service");
 const { parseSlugToFilters } = require("../utils/parseSlugToFilters");
 
@@ -17,7 +17,6 @@ const createProperty = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: "success",
-    message: "Property Added Successfully",
     data: property,
   });
 });
@@ -52,7 +51,11 @@ const getPropertiesFiltered = catchAsync(async (req, res) => {
   const moreFilters = req.query;
   const { filterSlug } = req.params;
 
-  const {filters, errors} = await parseSlugToFilters(filterSlug, moreFilters, tenantId); 
+  const { filters, errors } = await parseSlugToFilters(
+    filterSlug,
+    moreFilters,
+    tenantId
+  );
 
   if (errors && errors.length > 0) {
     return res.status(400).json({
@@ -62,41 +65,39 @@ const getPropertiesFiltered = catchAsync(async (req, res) => {
     });
   }
 
-  console.log(filters, 'filters in controller');
-  
-  console.log(tenantId, 'tenantId in controller');
-
   const properties = await searchPropertiesService(filters, tenantId);
 
   res
     .status(200)
-    .json({ status: "success", results: properties.length, properties });
+    .json({
+      status: "success",
+      data: { length: properties.length, properties },
+    });
 });
 
 const getFiltersForTenant = catchAsync(async (req, res) => {
   const tenantId = req.tenant.id;
   const filters = await getFiltersForTenantService(tenantId);
 
-  res.status(200).json({ status: "success", filters });
+  res.status(200).json({ status: "success", data: filters });
 });
 
-
-const getPropertiesSlugs = catchAsync( async (req,res,next) => {
+const getPropertiesSlugs = catchAsync(async (req, res, next) => {
   const tenantId = req.tenant.id;
   const slugs = await fetchPropertiesSlugs(tenantId);
   res.status(200).json(slugs);
-}) 
+});
 
-const getActivePropertiesTenant  = catchAsync(async (req, res) => {
+const getActivePropertiesTenant = catchAsync(async (req, res) => {
   const tenantId = req.tenant.id;
   const properties = await fetchActiveProperties(tenantId);
-  res.status(200).json({ status: "success", properties });
+  res.status(200).json({ status: "success", data: properties });
 });
 
 const getPropertyDetail = catchAsync(async (req, res) => {
   const { propertySlug } = req.params;
   const property = await getPropertyDetailService(propertySlug, req.tenant.id);
-  res.status(200).json({ status: "success", property });
+  res.status(200).json({ status: "success", data: property });
 });
 
 const getHighlightedProperties = catchAsync(async (req, res) => {
@@ -104,8 +105,8 @@ const getHighlightedProperties = catchAsync(async (req, res) => {
 
   const properties = await getHighlightedPropertiesService(tenantId);
 
-  res.status(200).json({ status: "success", properties });
-})
+  res.status(200).json({ status: "success", data: properties });
+});
 
 module.exports = {
   createProperty,
@@ -116,5 +117,5 @@ module.exports = {
   getPropertiesSlugs,
   getActivePropertiesTenant,
   getPropertyDetail,
-  getHighlightedProperties
+  getHighlightedProperties,
 };

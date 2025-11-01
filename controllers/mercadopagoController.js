@@ -2,8 +2,6 @@ const db = require("../db/models");
 const { MercadoPagoConfig, Preference, Payment } = require("mercadopago");
 const { User: User } = db;
 
-
-
 const client = new MercadoPagoConfig({
   accessToken: process.env.ACCESS_TOKEN_MP,
 });
@@ -13,7 +11,10 @@ const handlePreference = async (req, res) => {
     const { title, unit_price, quantity, courseId } = req.body;
 
     if (!title || !unit_price || !quantity) {
-      return res.status(400).json({ error: "Faltan datos en la solicitud" });
+      return res.status(400).json({
+        status: "failure",
+        error: "Faltan datos en la solicitud",
+      });
     }
 
     const preference = new Preference(client);
@@ -45,7 +46,7 @@ const handlePreference = async (req, res) => {
           installments: 1,
         },
         metadata: {
-           // Asegurate de enviar courseId desde el frontend
+          // Asegurate de enviar courseId desde el frontend
         },
       },
     });

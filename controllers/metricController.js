@@ -1,6 +1,8 @@
-const { catchMetricService, updateHeatPropertiesService } = require("../services/metric/metric.service");
+const {
+  catchMetricService,
+  updateHeatPropertiesService,
+} = require("../services/metric/metric.service");
 const catchAsync = require("../utils/catchAsync");
-
 
 const receiveMetric = catchAsync(async (req, res) => {
   const metric = req.body;
@@ -17,12 +19,11 @@ const updateHeatProperties = catchAsync(async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    message: `Proceso completado. Propiedades actualizadas: ${result.updated}, con errores: ${result.errors}`,
+    data: result,
   });
 });
 
-
 module.exports = {
   receiveMetric,
-  updateHeatProperties
+  updateHeatProperties,
 };

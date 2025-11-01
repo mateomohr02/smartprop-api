@@ -16,7 +16,7 @@ const createUser = catchAsync(async (req, res) => {
 const deleteUser = catchAsync(async (req, res) => {
   const { toDeleteUserId } = req.params;
   await removeUser(req.tenant.id, req.user.id, toDeleteUserId);
-  res.status(200).json({ status: "success", message: "User deleted successfully" });
+  res.status(200).json({ status: "success" });
 });
 
 
