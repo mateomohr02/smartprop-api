@@ -1,3 +1,4 @@
+const AppError = require("../utils/appError");
 const { addTenant, findTenant, setInactiveTenant, updateMetricsIds } = require("../services/tenant/tenant.service");
 const { addUser } = require("../services/user/user.service");
 const catchAsync = require("../utils/catchAsync");

@@ -1,4 +1,3 @@
-
 const { addUser, fetchUsersByTenantId, removeUser } = require("../services/user/user.service");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");

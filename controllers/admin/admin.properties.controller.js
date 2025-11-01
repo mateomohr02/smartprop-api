@@ -1,3 +1,4 @@
+const AppError = require("../../utils/appError");
 const {
   getPropertiesAdmin,
   getPropertyDetail,

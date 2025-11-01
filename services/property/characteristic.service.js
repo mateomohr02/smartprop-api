@@ -1,3 +1,4 @@
+const AppError = require("../../utils/appError");
 const { Characteristic, PropertyCharacteristic } = require("../../db/models");
 const { slugFormatter, nameFormatter } = require("../../utils/stringFormatter");
 

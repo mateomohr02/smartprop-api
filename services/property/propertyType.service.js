@@ -1,13 +1,11 @@
 const { PropertyType } = require("../../db/models");
 const { slugFormatter , nameFormatter} = require("../../utils/stringFormatter");
+const AppError = require("../../utils/appError");
+
 
 const fetchOrCreatePropertyType = async (propertyTypeSlug, tenantId) => {
   
-    //RECIBE SLUG o NAME TIPO DE PROP
-
   if (!propertyTypeSlug) return false;
-
-  //COMPRUEBA LA EXISTENCIA DE UN PROPERTYTYPE CON ESTE SLUG
 
   const existingPropertyType = await PropertyType.findOne({
     where: {
@@ -15,8 +13,6 @@ const fetchOrCreatePropertyType = async (propertyTypeSlug, tenantId) => {
       tenantId,
     },
   });
-
-  //SI NO EXISTE EL PROPERTYTYPE, LO CREA Y LO RETORNA
 
   if (!existingPropertyType) {
     const created = await PropertyType.create({
