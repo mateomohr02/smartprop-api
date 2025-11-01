@@ -8,7 +8,7 @@ const {
 const fetchDashboardMetricsController = catchAsync(async (req, res) => {
   const { tenant } = req;
   const metrics = await fetchDashboardMetrics(tenant.id);
-  return res.status(200).json({ status: "success", data: metrics });
+  return res.status(200).json({ status: "success", metrics });
 });
 
 module.exports = {
