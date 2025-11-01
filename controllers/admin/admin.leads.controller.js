@@ -20,7 +20,7 @@ const fetchLeadDetailController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!leadId || !tenant) {
-    return next(new AppError("Missing data for request."), 400)
+    return next(new AppError("Missing data for request.", 400))
   }
 
   const lead = await fetchLeadDetail(tenant.id, leadId);
@@ -37,11 +37,11 @@ const putLeadStatusController = catchAsync(async (req, res) => {
   const { tenant, user } = req;
 
   if (!leadId) {
-    return next(new AppError("Missing data for request."), 400)
+    return next(new AppError("Missing data for request.", 400))
   }
 
   if (!status) {
-    return next(new AppError("Missing data for request."), 400)
+    return next(new AppError("Missing data for request.", 400))
   }
 
   const lead = await putLeadStatusService(

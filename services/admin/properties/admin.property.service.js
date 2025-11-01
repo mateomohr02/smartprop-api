@@ -60,8 +60,6 @@ const getPropertyDetail = async (tenantId, propertyId) => {
 };
 
 const putProperty = async (tenantId, property) => {
-  console.log(tenantId, property, "put Prop service");
-
   const { id, ...fieldsToUpdate } = property;
 
   const propertyFound = await Property.findOne({

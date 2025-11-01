@@ -49,10 +49,10 @@ app.get('/', (req, res) => {
 
 app.use('/api', appRouter);
 
-// Manejo de rutas no encontradas
-app.use('*', catchAsync(async (req, res, next) => {
-  throw new AppError("Ruta no encontrada", 404);
-}));
+app.all('*', (req, res, next) => {
+  next(new AppError('Ruta no encontrada', 404));
+});
+
 
 // Manejador de errores
 app.use(globalErrorHandler);

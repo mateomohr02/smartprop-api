@@ -26,8 +26,7 @@ const createMetricSummary = async () => {
     });
 
     if (!events.length) {
-      console.log("[MetricSummary] No hay eventos para procesar.");
-      return;
+      throw new AppError("No events to process.");
     }
 
     // Agrupar por tenantId y eventType
@@ -54,10 +53,10 @@ const createMetricSummary = async () => {
     }
 
     console.log(
-      `[MetricSummary] Resumen generado: ${summaries.length} métricas procesadas.`
+      `[MetricSummary] Summary generated for ${yesterdayStr}. Total: ${summaries.length}.`
     );
   } catch (error) {
-    console.error("[MetricSummary] Error al generar resumen:", error);
+    throw new AppError("Error generating metric summary.");
   }
 };
 

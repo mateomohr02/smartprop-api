@@ -1,3 +1,4 @@
+const AppError = require("../../utils/appError");
 const { where } = require("sequelize");
 const {
   EventMetric,
@@ -21,17 +22,6 @@ const updateProperties = async (ids, field, tenantId) => {
 
 const catchMetricService = async (metric, tenantId) => {
   const { name, propertyId, postId, metadata } = metric;
-
-  console.log(
-    name,
-    "name",
-    propertyId,
-    "propertyId",
-    postId,
-    "postId",
-    metadata,
-    "metadata"
-  );
 
   switch (name) {
     case "visit_site":
@@ -154,12 +144,11 @@ const catchMetricService = async (metric, tenantId) => {
       break;
 
     default:
-      console.warn(`⚠️ Métrica desconocida recibida: ${name}`);
       const unknownMetric = await EventMetric.create({
         eventType: name,
         tenantId,
       });
-      break;
+      throw new AppError(`Unknown Metric Created ${unknownMetric}`);
   }
 };
 

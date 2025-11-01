@@ -8,7 +8,7 @@ const fetchOtherRoomsController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
-    return next(new AppError("Missing data for request."), 400)
+    return next(new AppError("Missing data for request.", 400))
   }
 
   const rooms = await fetchOtherRooms(tenant.id);

@@ -5,12 +5,12 @@ const catchAsync = require("../utils/catchAsync");
 
 const getUsersTenant = catchAsync(async (req, res) => {
   const users = await fetchUsersByTenantId(req.tenant.id);
-  res.status(200).json({ status: "success", data: users });
+  res.status(200).json({ status: "success",  users });
 });
 
 const createUser = catchAsync(async (req, res) => {
   const newUser = await addUser(req.body, null, req);
-  res.status(201).json({ status: "success", data: newUser });
+  res.status(201).json({ status: "success",  newUser });
 });
 
 const deleteUser = catchAsync(async (req, res) => {

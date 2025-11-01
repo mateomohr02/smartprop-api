@@ -1,7 +1,9 @@
+const AppError = require("../../utils/appError");
 const { Property, PropertyDailyStat } = require("../../db/models");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
+
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -16,7 +18,7 @@ const createPropertyDailyStat = async () => {
     const year = yesterday.year();
 
     console.log(
-      `[PropertyDailyStat] Generando registros para ${yesterday.format(
+      `[PropertyDailyStat] Generating stats for ${yesterday.format(
         "YYYY-MM-DD"
       )}`
     );
@@ -26,8 +28,7 @@ const createPropertyDailyStat = async () => {
     });
 
     if (!properties.length) {
-      console.log("[PropertyDailyStat] No hay propiedades para procesar.");
-      return;
+      throw new AppError("No properties to process.");
     }
 
     const records = properties.map((p) => ({
@@ -43,7 +44,7 @@ const createPropertyDailyStat = async () => {
 
     await PropertyDailyStat.bulkCreate(records);
   } catch (error) {
-    console.error("[PropertyDailyStat] Error al generar registros:", error);
+    throw new AppError("Error generating property daily stats.");
   }
 };
 

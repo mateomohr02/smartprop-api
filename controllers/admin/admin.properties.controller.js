@@ -32,7 +32,7 @@ const fetchPropertyDetailController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant || !propertyId) {
-    return next(new AppError("Missing data for request."), 400)
+    return next(new AppError("Missing data for request.", 400))
   }
   const propertyDetail = await getPropertyDetail(tenant.id, propertyId);
 
@@ -47,7 +47,7 @@ const putPropertyController = catchAsync(async (req, res) => {
   const { body } = req;
 
   if (!tenant || !body) {
-    return next(new AppError("Missing data for request."), 400)
+    return next(new AppError("Missing data for request.", 400))
   }
 
   const propertyUpdated = await putProperty(tenant.id, body);
@@ -62,7 +62,7 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
-    return next(new AppError("Missing data for request."), 400)
+    return next(new AppError("Missing data for request.", 400))
   }
 
   const propertyTypes = await fetchPropertyTypes(tenant.id);
@@ -77,10 +77,10 @@ const uploadMultimediaController = async (req, res) => {
   try {
     const { tenant } = req;
     if (!tenant)
-      return next(new AppError("Missing data for request."), 400)
+      return next(new AppError("Missing data for request.", 400))
 
     if (!req.files || req.files.length === 0)
-      return next(new AppError("Missing files."), 400)
+      return next(new AppError("Missing files.", 400))
 
     // Función helper que envuelve upload_stream en una Promesa
     const uploadToCloudinary = (fileBuffer) => {
@@ -103,7 +103,7 @@ const uploadMultimediaController = async (req, res) => {
 
     res.status(200).json({ urls: uploaded });
   } catch (error) {
-    return next(new AppError("Error while uploading multimedia."), 500)
+    return next(new AppError("Error while uploading multimedia.", 500))
   }
 };
 

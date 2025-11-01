@@ -44,22 +44,19 @@ const fetchLocations = async (locationChildOf = null) => {
         });
 
       default:
-        throw new AppError(`Tipo de ubicación no reconocido: ${locationChildOf.type}`);
+        throw new AppError(`Unknown Location Type: ${locationChildOf.type}`);
     }
   } catch (error) {
     console.error("Error al obtener ubicaciones:", error);
-    throw new AppError("No se pudieron obtener las ubicaciones hijas.");
+    throw new AppError("No child Locations found.");
   }
 };
 
 const getLatLngFromGoogleMapsUrl = async (url) => {
   try {
-    // 1️⃣ Seguir la redirección
     const response = await fetch(url, { redirect: "follow" });
     const finalUrl = response.url;
-    console.log(response, 'response');
     
-    // 2️⃣ Buscar coordenadas dentro de la URL final
     const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
     const match = finalUrl.match(regex);
 
@@ -67,7 +64,6 @@ const getLatLngFromGoogleMapsUrl = async (url) => {
       return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
     }
 
-    // 3️⃣ Buscar coordenadas en formato ?q=lat,long
     const qMatch = finalUrl.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
     if (qMatch) {
       return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
@@ -75,8 +71,7 @@ const getLatLngFromGoogleMapsUrl = async (url) => {
 
     return null;
   } catch (error) {
-    console.error("Error obteniendo coordenadas:", error);
-    return null;
+    throw new AppError("Error getting coordinates.");
   }
 };
 

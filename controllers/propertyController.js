@@ -17,7 +17,7 @@ const createProperty = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: "success",
-    data: property,
+    property,
   });
 });
 
@@ -43,7 +43,7 @@ const setIsActiveProperty = catchAsync(async (req, res) => {
 
   const property = await toggleIsActiveProperty(propertyId, tenantId, userId);
 
-  res.status(200).json({ status: "success", data: property });
+  res.status(200).json({ status: "success", property });
 });
 
 const getPropertiesFiltered = catchAsync(async (req, res) => {
@@ -58,7 +58,7 @@ const getPropertiesFiltered = catchAsync(async (req, res) => {
   );
 
   if (errors && errors.length > 0) {
-    return next(new AppError("Errors with filters."), 400)
+    return next(new AppError("Errors with filters.", 400))
   }
 
   const properties = await searchPropertiesService(filters, tenantId);
@@ -87,13 +87,13 @@ const getPropertiesSlugs = catchAsync(async (req, res, next) => {
 const getActivePropertiesTenant = catchAsync(async (req, res) => {
   const tenantId = req.tenant.id;
   const properties = await fetchActiveProperties(tenantId);
-  res.status(200).json({ status: "success", data: properties });
+  res.status(200).json({ status: "success", properties });
 });
 
 const getPropertyDetail = catchAsync(async (req, res) => {
   const { propertySlug } = req.params;
   const property = await getPropertyDetailService(propertySlug, req.tenant.id);
-  res.status(200).json({ status: "success", data: property });
+  res.status(200).json({ status: "success", property });
 });
 
 const getHighlightedProperties = catchAsync(async (req, res) => {
@@ -101,7 +101,7 @@ const getHighlightedProperties = catchAsync(async (req, res) => {
 
   const properties = await getHighlightedPropertiesService(tenantId);
 
-  res.status(200).json({ status: "success", data: properties });
+  res.status(200).json({ status: "success", properties });
 });
 
 module.exports = {

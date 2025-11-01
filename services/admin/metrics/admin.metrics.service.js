@@ -1,13 +1,13 @@
+const AppError = require("../../../utils/appError");
+
 const { Op, fn, col, literal } = require("sequelize");
 const { MetricSummary, Lead } = require("../../../db/models");
 
 const fetchDashboardMetrics = async (tenantId) => {
-  // Fecha de corte: hoy menos 5 meses
   const now = new Date();
   const fiveMonthsAgo = new Date();
   fiveMonthsAgo.setMonth(now.getMonth() - 5);
 
-  // Query: agrupar por mes y métrica
   const summaries = await MetricSummary.findAll({
     where: {
       tenantId,
@@ -16,7 +16,7 @@ const fetchDashboardMetrics = async (tenantId) => {
       }
     },
     attributes: [
-      [fn("DATE_TRUNC", "month", col("date")), "month"], // agrupamos por mes usando la columna "date"
+      [fn("DATE_TRUNC", "month", col("date")), "month"],
       "metric",
       [fn("SUM", col("count")), "total"]
     ],
@@ -25,7 +25,6 @@ const fetchDashboardMetrics = async (tenantId) => {
     raw: true
   });
 
-  // Organizar resultados en un objeto por métrica
   const metrics = {
     visit_site: [],
     visit_blog: [],
