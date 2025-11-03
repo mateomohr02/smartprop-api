@@ -9,11 +9,14 @@ const {
   Comodity,
   Characteristic,
   Room,
-  Sequelize,
+  PropertyCharacteristic,
 } = require("../../../db/models");
 const { slugFormatter } = require("../../../utils/stringFormatter");
 const { validateLocation } = require("../location/helpers/validateLocation");
 const { createLocation } = require("../location/helpers/createLocation");
+const {
+  findOrCreateCharacteristic,
+} = require("../characteristics/helpers/findOrCreateCharacteristic");
 
 //CREATE PROPERTY SERVICES
 const createPropertyRegistry = async (tenantId, userId, propertyData) => {
@@ -99,7 +102,12 @@ const addPropertyData = async (propertyId, tenantId, userId, propertyData) => {
   return property;
 };
 
-const addPropertyLocation = async (propertyId, tenantId, userId, propertyData) => {
+const addPropertyLocation = async (
+  propertyId,
+  tenantId,
+  userId,
+  propertyData
+) => {
   const property = await Property.findOne({
     where: { id: propertyId, tenantId },
   });
@@ -109,21 +117,30 @@ const addPropertyLocation = async (propertyId, tenantId, userId, propertyData) =
   // === COUNTRY ===
   let countryId;
   if (propertyData.country.exists === true) {
-    const country = await validateLocation(propertyData.country.value, "country");
+    const country = await validateLocation(
+      propertyData.country.value,
+      "country"
+    );
     if (!country) throw new AppError("Invalid country", 400);
     countryId = country.id;
   } else if (propertyData.country.exists === false) {
-    const country = await createLocation({ type: "country", value: propertyData.country.value });
+    const country = await createLocation({
+      type: "country",
+      value: propertyData.country.value,
+    });
     countryId = country.id;
   } else {
     throw new AppError("Missing country", 400);
   }
 
   // === PROVINCE ===
-  
+
   let provinceId;
   if (propertyData.province.exists === true) {
-    const province = await validateLocation(propertyData.province.value, "province");
+    const province = await validateLocation(
+      propertyData.province.value,
+      "province"
+    );
     if (!province) throw new AppError("Invalid province", 400);
     provinceId = province.id;
   } else if (propertyData.province.exists === false) {
@@ -137,8 +154,8 @@ const addPropertyLocation = async (propertyId, tenantId, userId, propertyData) =
   }
 
   // === CITY ===
-  console.log(provinceId, 'provinceId');
-  
+  console.log(provinceId, "provinceId");
+
   let cityId;
   if (propertyData.city.exists === true) {
     const city = await validateLocation(propertyData.city.value, "city");
@@ -155,11 +172,14 @@ const addPropertyLocation = async (propertyId, tenantId, userId, propertyData) =
   }
 
   // === NEIGHBORHOOD ===
-  console.log(cityId, 'cityId');
-  
+  console.log(cityId, "cityId");
+
   let neighborhoodId;
   if (propertyData.neighborhood.exists === true) {
-    const neighborhood = await validateLocation(propertyData.neighborhood.value, "neighborhood");
+    const neighborhood = await validateLocation(
+      propertyData.neighborhood.value,
+      "neighborhood"
+    );
     if (!neighborhood) throw new AppError("Invalid neighborhood", 400);
     neighborhoodId = neighborhood.id;
   } else if (propertyData.neighborhood.exists === false) {
@@ -188,14 +208,52 @@ const addPropertyMultimedia = async (
   tenantId,
   userId,
   propertyData
-) => {};
+) => {
+  const property = await Property.findOne({
+    where: { id: propertyId, tenantId },
+  });
+
+  if (!property) throw new AppError("Invalid property", 400);
+
+  property.multimedia = propertyData.multimedia || null;
+
+  await property.save();
+
+  return property;
+};
 
 const addPropertyCharacteristics = async (
   propertyId,
   tenantId,
   userId,
   propertyData
-) => {};
+) => {
+  const property = await Property.findOne({
+    where: { id: propertyId, tenantId },
+  });
+
+  if (!property) throw new AppError("Invalid property", 400);
+  if (!Array.isArray(propertyData.characteristics)) {
+    throw new AppError("Invalid characteristics format", 400);
+  }
+
+  const propertyCharacteristics = await Promise.all(
+    propertyData.characteristics.map(async (char) => {
+      const foundCharacteristic = await findOrCreateCharacteristic(
+        char,
+        tenantId
+      );
+      return await PropertyCharacteristic.create({
+        propertyId,
+        characteristicId: foundCharacteristic.id,
+        tenantId,
+        createdBy: userId,
+      });
+    })
+  );
+
+  return propertyCharacteristics;
+};
 
 const addPropertyComodities = async (
   propertyId,
@@ -295,6 +353,8 @@ module.exports = {
   createPropertyRegistry,
   addPropertyData,
   addPropertyLocation,
+  addPropertyCharacteristics,
+  addPropertyMultimedia,
   getPropertiesAdmin,
   putProperty,
   fetchPropertyTypes,

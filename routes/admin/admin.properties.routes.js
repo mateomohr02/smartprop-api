@@ -1,12 +1,14 @@
 const {
     createPropertyController,
     addPropertyLocationController,
+    addPropertyCharacteristicsController,
     fetchPropertiesController,
     fetchPropertyDetailController,
     putPropertyController,
     fetchPopertyTypesController,
     uploadMultimediaController,
     addPropertyDataController,
+    addPropertyMultimediaController,
 } = require("../../controllers/admin/admin.properties.controller");
 
 const router = require("express").Router();
@@ -24,8 +26,8 @@ router.route("/multimedia/upload").post(upload.array("files", 10), uploadMultime
 router.route("/create").post(createPropertyController);
 router.route("/add/data/:propertyId").put(addPropertyDataController);
 router.route("/add/location/:propertyId").put(addPropertyLocationController);
-router.route("/add/multimedia/:propertyId").post();
-router.route("/add/characteristics/:propertyId").post();
+router.route("/add/multimedia/:propertyId").put(addPropertyMultimediaController);
+router.route("/add/characteristics/:propertyId").put(addPropertyCharacteristicsController);
 router.route("/add/comodities/:propertyId").post();
 router.route("/add/rooms/:propertyId").post();
 router.route("/publish/:propertyId").put();

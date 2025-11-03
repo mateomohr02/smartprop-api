@@ -3,10 +3,12 @@ const {
   createPropertyRegistry,
   addPropertyData,
   addPropertyLocation,
+  addPropertyMultimedia,
   getPropertiesAdmin,
   getPropertyDetail,
   putProperty,
   fetchPropertyTypes,
+  addPropertyCharacteristics,
 } = require("../../services/admin/properties/admin.property.service");
 
 const catchAsync = require("../../utils/catchAsync");
@@ -20,15 +22,15 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const createPropertyController = catchAsync(async (req, res) => {
-  const {tenant} = req;
-  const {user} = req;
-  const {body} = req;
+const createPropertyController = catchAsync(async (req, res,next) => {
+  const { tenant } = req;
+  const { user } = req;
+  const { body } = req;
 
   if (!tenant || !user || !body.title || !body.description) {
     return next(new AppError("Missing data for request.", 400));
   }
-  
+
   const property = await createPropertyRegistry(tenant.id, user.id, body);
 
   return res.status(200).json({
@@ -36,13 +38,12 @@ const createPropertyController = catchAsync(async (req, res) => {
     message: "Propiedad Inicializada",
     property,
   });
-
 });
 
-const addPropertyDataController = catchAsync(async (req, res) => {
-  const {propertyId} = req.params;
-  
-  const {tenant, user, body} = req;
+const addPropertyDataController = catchAsync(async (req, res, next) => {
+  const { propertyId } = req.params;
+
+  const { tenant, user, body } = req;
 
   if (!tenant || !user || !body || !propertyId) {
     return next(new AppError("Missing data for request.", 400));
@@ -55,31 +56,78 @@ const addPropertyDataController = catchAsync(async (req, res) => {
     message: "Datos añadidos correctamente",
     property,
   });
+});
 
-})
+const addPropertyLocationController = catchAsync(async (req, res, next) => {
+  const { propertyId } = req.params;
 
-const addPropertyLocationController = catchAsync(async (req, res) => {
-
-  const {propertyId} = req.params;
-  
-  const {tenant, user, body} = req;
+  const { tenant, user, body } = req;
 
   if (!tenant || !user || !body || !propertyId) {
     return next(new AppError("Missing data for request.", 400));
   }
 
-  const property = await addPropertyLocation(propertyId, tenant.id, user.id, body);
+  const property = await addPropertyLocation(
+    propertyId,
+    tenant.id,
+    user.id,
+    body
+  );
 
   return res.status(200).json({
     status: "success",
     message: "Ubiación añadida correctamente",
     property,
   });
+});
 
-})
+const addPropertyMultimediaController = catchAsync(async (req, res, next) => {
+  const { propertyId } = req.params;
+
+  const { tenant, user, body } = req;
+
+  if (!tenant || !user || !body || !propertyId) {
+    return next(new AppError("Missing data for request.", 400));
+  }
+
+  const property = await addPropertyMultimedia(
+    propertyId,
+    tenant.id,
+    user.id,
+    body
+  );
+
+  return res.status(200).json({
+    status: "success",
+    message: "Archivos Multimedia Agregados",
+    property,
+  });
+});
+
+const addPropertyCharacteristicsController = catchAsync(async (req, res, next) => {
+  const { propertyId } = req.params;
+  const { tenant, user, body } = req;
+
+  if (!tenant || !user || !body || !propertyId) {
+    return next(new AppError("Missing data for request.", 400));
+  }
+
+  const propertyCharacteristics = await addPropertyCharacteristics(
+    propertyId,
+    tenant.id,
+    user.id,
+    body
+  );
+
+  return res.status(200).json({
+    status: "success",
+    message: "Características agregadas correctamente",
+    propertyCharacteristics,
+  });
+});
 
 
-const fetchPropertiesController = catchAsync(async (req, res) => {
+const fetchPropertiesController = catchAsync(async (req, res, next) => {
   const { tenant } = req;
 
   const properties = await getPropertiesAdmin(tenant.id);
@@ -90,7 +138,7 @@ const fetchPropertiesController = catchAsync(async (req, res) => {
   });
 });
 
-const fetchPropertyDetailController = catchAsync(async (req, res) => {
+const fetchPropertyDetailController = catchAsync(async (req, res, next) => {
   const { propertyId } = req.params;
   const { tenant } = req;
 
@@ -105,7 +153,7 @@ const fetchPropertyDetailController = catchAsync(async (req, res) => {
   });
 });
 
-const putPropertyController = catchAsync(async (req, res) => {
+const putPropertyController = catchAsync(async (req, res, next) => {
   const { tenant } = req;
   const { body } = req;
 
@@ -121,7 +169,7 @@ const putPropertyController = catchAsync(async (req, res) => {
   });
 });
 
-const fetchPopertyTypesController = catchAsync(async (req, res) => {
+const fetchPopertyTypesController = catchAsync(async (req, res, next) => {
   const { tenant } = req;
 
   if (!tenant) {
@@ -136,7 +184,7 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
   });
 });
 
-const uploadMultimediaController = async (req, res) => {
+const uploadMultimediaController = async (req, res, next) => {
   try {
     const { tenant } = req;
     if (!tenant) return next(new AppError("Missing data for request.", 400));
@@ -172,10 +220,12 @@ const uploadMultimediaController = async (req, res) => {
 module.exports = {
   addPropertyDataController,
   addPropertyLocationController,
+  addPropertyMultimediaController,
+  addPropertyCharacteristicsController,
   fetchPropertiesController,
   fetchPropertyDetailController,
   putPropertyController,
   fetchPopertyTypesController,
   uploadMultimediaController,
-  createPropertyController
+  createPropertyController,
 };
