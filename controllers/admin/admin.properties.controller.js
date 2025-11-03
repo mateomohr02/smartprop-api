@@ -1,5 +1,8 @@
 const AppError = require("../../utils/appError");
 const {
+  createPropertyRegistry,
+  addPropertyData,
+  addPropertyLocation,
   getPropertiesAdmin,
   getPropertyDetail,
   putProperty,
@@ -17,6 +20,65 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const createPropertyController = catchAsync(async (req, res) => {
+  const {tenant} = req;
+  const {user} = req;
+  const {body} = req;
+
+  if (!tenant || !user || !body.title || !body.description) {
+    return next(new AppError("Missing data for request.", 400));
+  }
+  
+  const property = await createPropertyRegistry(tenant.id, user.id, body);
+
+  return res.status(200).json({
+    status: "success",
+    message: "Propiedad Inicializada",
+    property,
+  });
+
+});
+
+const addPropertyDataController = catchAsync(async (req, res) => {
+  const {propertyId} = req.params;
+  
+  const {tenant, user, body} = req;
+
+  if (!tenant || !user || !body || !propertyId) {
+    return next(new AppError("Missing data for request.", 400));
+  }
+
+  const property = await addPropertyData(propertyId, tenant.id, user.id, body);
+
+  return res.status(200).json({
+    status: "success",
+    message: "Datos añadidos correctamente",
+    property,
+  });
+
+})
+
+const addPropertyLocationController = catchAsync(async (req, res) => {
+
+  const {propertyId} = req.params;
+  
+  const {tenant, user, body} = req;
+
+  if (!tenant || !user || !body || !propertyId) {
+    return next(new AppError("Missing data for request.", 400));
+  }
+
+  const property = await addPropertyLocation(propertyId, tenant.id, user.id, body);
+
+  return res.status(200).json({
+    status: "success",
+    message: "Ubiación añadida correctamente",
+    property,
+  });
+
+})
+
+
 const fetchPropertiesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
@@ -33,7 +95,7 @@ const fetchPropertyDetailController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant || !propertyId) {
-    return next(new AppError("Missing data for request.", 400))
+    return next(new AppError("Missing data for request.", 400));
   }
   const propertyDetail = await getPropertyDetail(tenant.id, propertyId);
 
@@ -48,7 +110,7 @@ const putPropertyController = catchAsync(async (req, res) => {
   const { body } = req;
 
   if (!tenant || !body) {
-    return next(new AppError("Missing data for request.", 400))
+    return next(new AppError("Missing data for request.", 400));
   }
 
   const propertyUpdated = await putProperty(tenant.id, body);
@@ -63,7 +125,7 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
   const { tenant } = req;
 
   if (!tenant) {
-    return next(new AppError("Missing data for request.", 400))
+    return next(new AppError("Missing data for request.", 400));
   }
 
   const propertyTypes = await fetchPropertyTypes(tenant.id);
@@ -77,11 +139,10 @@ const fetchPopertyTypesController = catchAsync(async (req, res) => {
 const uploadMultimediaController = async (req, res) => {
   try {
     const { tenant } = req;
-    if (!tenant)
-      return next(new AppError("Missing data for request.", 400))
+    if (!tenant) return next(new AppError("Missing data for request.", 400));
 
     if (!req.files || req.files.length === 0)
-      return next(new AppError("Missing files.", 400))
+      return next(new AppError("Missing files.", 400));
 
     // Función helper que envuelve upload_stream en una Promesa
     const uploadToCloudinary = (fileBuffer) => {
@@ -104,14 +165,17 @@ const uploadMultimediaController = async (req, res) => {
 
     res.status(200).json({ urls: uploaded });
   } catch (error) {
-    return next(new AppError("Error while uploading multimedia.", 500))
+    return next(new AppError("Error while uploading multimedia.", 500));
   }
 };
 
 module.exports = {
+  addPropertyDataController,
+  addPropertyLocationController,
   fetchPropertiesController,
   fetchPropertyDetailController,
   putPropertyController,
   fetchPopertyTypesController,
   uploadMultimediaController,
+  createPropertyController
 };

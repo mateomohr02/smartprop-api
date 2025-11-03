@@ -163,12 +163,17 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
 
+      slug: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
       //4 PASO: AÑADIENDO MULTIMEDIA
       multimedia: {
         type: DataTypes.JSONB,
         allowNull: true,
       },
-
+      
       //5 PASO: AÑADIENDO CARACTERÍSTICAS
 
       //6 PASO: AÑADIENDO COMODIDADES
@@ -205,10 +210,6 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
 
-      slug: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
     },
     { timestamps: true }
   );
