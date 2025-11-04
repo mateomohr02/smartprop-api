@@ -4,11 +4,13 @@ const {
   addPropertyData,
   addPropertyLocation,
   addPropertyMultimedia,
+  addPropertyComodities,
   getPropertiesAdmin,
   getPropertyDetail,
   putProperty,
   fetchPropertyTypes,
   addPropertyCharacteristics,
+  addPropertyRooms,
 } = require("../../services/admin/properties/admin.property.service");
 
 const catchAsync = require("../../utils/catchAsync");
@@ -22,7 +24,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const createPropertyController = catchAsync(async (req, res,next) => {
+const createPropertyController = catchAsync(async (req, res, next) => {
   const { tenant } = req;
   const { user } = req;
   const { body } = req;
@@ -104,7 +106,31 @@ const addPropertyMultimediaController = catchAsync(async (req, res, next) => {
   });
 });
 
-const addPropertyCharacteristicsController = catchAsync(async (req, res, next) => {
+const addPropertyCharacteristicsController = catchAsync(
+  async (req, res, next) => {
+    const { propertyId } = req.params;
+    const { tenant, user, body } = req;
+
+    if (!tenant || !user || !body || !propertyId) {
+      return next(new AppError("Missing data for request.", 400));
+    }
+
+    const propertyCharacteristics = await addPropertyCharacteristics(
+      propertyId,
+      tenant.id,
+      user.id,
+      body
+    );
+
+    return res.status(200).json({
+      status: "success",
+      message: "Características agregadas correctamente",
+      propertyCharacteristics,
+    });
+  }
+);
+
+const addPropertyComoditiesController = catchAsync(async (req, res, next) => {
   const { propertyId } = req.params;
   const { tenant, user, body } = req;
 
@@ -112,7 +138,28 @@ const addPropertyCharacteristicsController = catchAsync(async (req, res, next) =
     return next(new AppError("Missing data for request.", 400));
   }
 
-  const propertyCharacteristics = await addPropertyCharacteristics(
+  const propertyComodities = await addPropertyComodities(
+    propertyId,
+    tenant.id,
+    user.id,
+    body
+  );
+  return res.status(200).json({
+    status: "success",
+    message: "Comodities agregadas correctamente",
+    propertyComodities,
+  });
+});
+
+const addPropertyRoomsController = catchAsync(async (req, res, next) => {
+  const { propertyId } = req.params;
+  const { tenant, user, body } = req;
+
+  if (!tenant || !user || !body || !propertyId) {
+    return next(new AppError("Missing data for request.", 400));
+  }
+
+  const propertyRooms = await addPropertyRooms(
     propertyId,
     tenant.id,
     user.id,
@@ -121,12 +168,12 @@ const addPropertyCharacteristicsController = catchAsync(async (req, res, next) =
 
   return res.status(200).json({
     status: "success",
-    message: "Características agregadas correctamente",
-    propertyCharacteristics,
+    message: "Ambientes agregados correctamente",
+    propertyRooms,
   });
 });
 
-
+//OTROS CONTROLLERS
 const fetchPropertiesController = catchAsync(async (req, res, next) => {
   const { tenant } = req;
 
@@ -222,6 +269,8 @@ module.exports = {
   addPropertyLocationController,
   addPropertyMultimediaController,
   addPropertyCharacteristicsController,
+  addPropertyComoditiesController,
+  addPropertyRoomsController,
   fetchPropertiesController,
   fetchPropertyDetailController,
   putPropertyController,

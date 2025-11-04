@@ -10,13 +10,16 @@ const {
   Characteristic,
   Room,
   PropertyCharacteristic,
+  PropertyComodity,
+  PropertyRoom
 } = require("../../../db/models");
 const { slugFormatter } = require("../../../utils/stringFormatter");
 const { validateLocation } = require("../location/helpers/validateLocation");
 const { createLocation } = require("../location/helpers/createLocation");
-const {
-  findOrCreateCharacteristic,
-} = require("../characteristics/helpers/findOrCreateCharacteristic");
+const { findOrCreateCharacteristic } = require("../characteristics/helpers/findOrCreateCharacteristic");
+const { findOrCreateRoom } = require("../rooms/helpers/findOrCreateRoom");
+const { findOrCreateComodities } = require("../comodities/helpers/findOrCreateComodities");
+
 
 //CREATE PROPERTY SERVICES
 const createPropertyRegistry = async (tenantId, userId, propertyData) => {
@@ -247,7 +250,6 @@ const addPropertyCharacteristics = async (
         propertyId,
         characteristicId: foundCharacteristic.id,
         tenantId,
-        createdBy: userId,
       });
     })
   );
@@ -260,21 +262,71 @@ const addPropertyComodities = async (
   tenantId,
   userId,
   propertyData
-) => {};
+) => {
+  const property = await Property.findOne({
+    where: { id: propertyId, tenantId },
+  });
 
-const addPropertyRooms = async (
-  propertyId,
-  tenantId,
-  userId,
-  propertyData
-) => {};
+  if (!property) throw new AppError("Invalid property", 400);
+  if (!Array.isArray(propertyData.comodities)) {
+    throw new AppError("Invalid comodities format", 400);
+  }
+
+  const propertyComodities = await Promise.all(
+    propertyData.comodities.map(async (com) => {
+      const foundComodity = await findOrCreateComodities(
+        com,
+        tenantId
+      );
+      return await PropertyComodity.create({
+        propertyId,
+        comodityId: foundComodity.id,
+        tenantId,
+      });
+    })
+  );
+
+  return propertyComodities;
+
+};
+
+const addPropertyRooms = async (propertyId,tenantId,userId,propertyData) => {
+  const property = await Property.findOne({
+    where: { id: propertyId, tenantId },
+  });
+
+  if (!property) throw new AppError("Invalid property", 400);
+  if (!Array.isArray(propertyData.rooms)) {
+    throw new AppError("Invalid properties format", 400);
+  }
+
+  const propertyRooms = await Promise.all(
+    propertyData.rooms.map(async (room) => {
+      const foundRoom = await findOrCreateRoom(
+        room,
+        tenantId
+      );
+       return await PropertyRoom.create({
+         propertyId,
+         roomId: foundRoom.id,
+         size: room.size || null,
+         value: room.quantity || 1,
+         tenantId,
+       });
+    })
+  );
+  
+  return propertyRooms;
+
+};
 
 const publishProperty = async (
   propertyId,
   tenantId,
   userId,
   propertyData
-) => {};
+) => {
+};
 
 //OTHER SERVICES
 const getPropertiesAdmin = async (tenantId) => {
@@ -355,6 +407,8 @@ module.exports = {
   addPropertyLocation,
   addPropertyCharacteristics,
   addPropertyMultimedia,
+  addPropertyComodities,
+  addPropertyRooms,
   getPropertiesAdmin,
   putProperty,
   fetchPropertyTypes,

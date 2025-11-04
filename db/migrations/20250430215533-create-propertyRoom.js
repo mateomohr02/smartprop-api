@@ -21,7 +21,7 @@ module.exports = {
       },
       roomId: {
         type: Sequelize.UUID,
-        allownull: false,
+        allowNull: false,
         references: {
           model: "Rooms",
           key: "id",
