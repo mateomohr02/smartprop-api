@@ -12,11 +12,11 @@ const fetchComoditiesController = catchAsync(async (req, res) => {
     return next(new AppError("Missing data for request.", 400))
   }
 
-  const comodites = await fetchComodities(tenant.id);
+  const comodities = await fetchComodities(tenant.id);
 
   return res.status(200).json({
     status: "success",
-    data: comodites,
+    comodities,
   });
 });
 

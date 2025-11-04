@@ -5,7 +5,7 @@ const {
 
 const router = require("express").Router();
 
-router.route("").get(fetchPlacesController);
+router.route("").post(fetchPlacesController);
 
 router.route("/parse").post(parseMapLocation);
 
