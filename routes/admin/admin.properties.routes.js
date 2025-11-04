@@ -11,6 +11,7 @@ const {
     addPropertyMultimediaController,
     addPropertyComoditiesController,
     addPropertyRoomsController,
+    publishPropertyController
 } = require("../../controllers/admin/admin.properties.controller");
 
 const router = require("express").Router();
@@ -30,7 +31,7 @@ router.route("/add/data/:propertyId").put(addPropertyDataController);
 router.route("/add/location/:propertyId").put(addPropertyLocationController);
 router.route("/add/multimedia/:propertyId").put(addPropertyMultimediaController);
 
-router.route("/publish/:propertyId").put();
+router.route("/publish/:propertyId").put(publishPropertyController);
 
 //VAN EN OTRO ROUTER
 router.route("/add/characteristics/:propertyId").post(addPropertyCharacteristicsController);

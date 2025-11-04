@@ -11,6 +11,7 @@ const {
   fetchPropertyTypes,
   addPropertyCharacteristics,
   addPropertyRooms,
+  publishProperty
 } = require("../../services/admin/properties/admin.property.service");
 
 const catchAsync = require("../../utils/catchAsync");
@@ -173,6 +174,25 @@ const addPropertyRoomsController = catchAsync(async (req, res, next) => {
   });
 });
 
+const publishPropertyController = catchAsync(async (req, res, next) => {
+
+  const { propertyId } = req.params;
+  const { tenant, user } = req;
+
+  if (!tenant || !user || !propertyId) {
+    return next(new AppError("Missing data for request.", 400));
+  }
+
+  const property = await publishProperty(propertyId, tenant.id, user.id);
+
+  return res.status(200).json({
+    status: "success",
+    message: "Propiedad publicada.",
+    property,
+  });
+
+});
+
 //OTROS CONTROLLERS
 const fetchPropertiesController = catchAsync(async (req, res, next) => {
   const { tenant } = req;
@@ -277,4 +297,5 @@ module.exports = {
   fetchPopertyTypesController,
   uploadMultimediaController,
   createPropertyController,
+  publishPropertyController
 };

@@ -11,7 +11,8 @@ const {
   Room,
   PropertyCharacteristic,
   PropertyComodity,
-  PropertyRoom
+  PropertyRoom,
+  Modification
 } = require("../../../db/models");
 const { slugFormatter } = require("../../../utils/stringFormatter");
 const { validateLocation } = require("../location/helpers/validateLocation");
@@ -320,12 +321,50 @@ const addPropertyRooms = async (propertyId,tenantId,userId,propertyData) => {
 
 };
 
-const publishProperty = async (
-  propertyId,
-  tenantId,
-  userId,
-  propertyData
-) => {
+const publishProperty = async ( propertyId, tenantId, userId) => {
+
+  const property = await Property.findOne({
+    where: { id: propertyId, tenantId },
+    include: [
+      { model: PropertyType, attributes: ["name"] },
+      { model: PropertyType, attributes: ["name"] },
+      { model: City, attributes: ["name"] },
+      { model: Province, attributes: ["name"] },
+      { model: Country, attributes: ["name"] },
+      { model: Neighborhood, attributes: ["name"] },
+      {
+        model: Comodity,
+        through: { attributes: [] },
+        attributes: ["name", "id"],
+      },
+      {
+        model: Characteristic,
+        through: { attributes: [] },
+        attributes: ["name", "id"],
+      },
+      {
+        model: Room,
+        through: { attributes: [] },
+        attributes: ["name", "id"],
+      },
+    ]
+  });
+
+  if (!property) throw new AppError("Invalid property", 400);
+  
+  property.status = "published";
+
+  const modification = await Modification.create({
+    propertyId: property.id,
+    userId,
+    tenantId,
+    metadata: { property }
+  })
+
+  await property.save();
+
+  return property;
+
 };
 
 //OTHER SERVICES
@@ -413,4 +452,5 @@ module.exports = {
   putProperty,
   fetchPropertyTypes,
   getPropertyDetail,
+  publishProperty
 };
