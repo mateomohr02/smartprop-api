@@ -183,7 +183,7 @@ const publishPropertyController = catchAsync(async (req, res, next) => {
     return next(new AppError("Missing data for request.", 400));
   }
 
-  const property = await publishProperty(propertyId, tenant.id, user.id);
+  const property = await publishProperty(propertyId, tenant, user.id);
 
   return res.status(200).json({
     status: "success",

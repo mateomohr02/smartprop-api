@@ -321,10 +321,10 @@ const addPropertyRooms = async (propertyId,tenantId,userId,propertyData) => {
 
 };
 
-const publishProperty = async ( propertyId, tenantId, userId) => {
+const publishProperty = async ( propertyId, tenant, userId) => {
 
   const property = await Property.findOne({
-    where: { id: propertyId, tenantId },
+    where: { id: propertyId, tenantId: tenant.id },
     include: [
       { model: PropertyType, attributes: ["name"] },
       { model: PropertyType, attributes: ["name"] },
@@ -347,17 +347,34 @@ const publishProperty = async ( propertyId, tenantId, userId) => {
         through: { attributes: [] },
         attributes: ["name", "id"],
       },
+      {
+        model: Tenant,
+        through: { attributes: [] },
+        attributes: ["name"],
+      },
     ]
   });
 
   if (!property) throw new AppError("Invalid property", 400);
-  
+  const shortId = nanoid(6);
+  const propertySlug = slugFormatter(
+    `${
+      operation === "sale"
+        ? "venta"
+        : operation === "rent"
+        ? "alquiler"
+        : "short-term"
+    } ${property.title} ${property.rooms} "ambientes" ${property.address} "en" ${property.city.name} ${
+      property.neighborhood.name
+    } ${property.price} ${property.priceFIAT} ${tenant.id} ${shortId}`
+  )
+
   property.status = "published";
 
   const modification = await Modification.create({
     propertyId: property.id,
     userId,
-    tenantId,
+    tenantId: tenant.id,
     metadata: { property }
   })
 
