@@ -15,7 +15,7 @@ const findOrCreateRoom = async ({exists, value}, tenantId) => {
       },
     });
 
-    if (!comodity) {
+    if (!room) {
       throw new AppError("Invalid room", 400);
     }
   } else if (

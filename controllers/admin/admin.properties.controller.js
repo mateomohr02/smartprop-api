@@ -116,6 +116,9 @@ const addPropertyCharacteristicsController = catchAsync(
       return next(new AppError("Missing data for request.", 400));
     }
 
+    console.log(body, 'body');
+    
+
     const propertyCharacteristics = await addPropertyCharacteristics(
       propertyId,
       tenant.id,
@@ -182,7 +185,7 @@ const publishPropertyController = catchAsync(async (req, res, next) => {
   if (!tenant || !user || !propertyId) {
     return next(new AppError("Missing data for request.", 400));
   }
-
+  
   const property = await publishProperty(propertyId, tenant, user.id);
 
   return res.status(200).json({

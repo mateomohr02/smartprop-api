@@ -1,5 +1,7 @@
 const AppError = require("../../../utils/appError");
+const { nanoid } = require("nanoid");
 const {
+  Tenant,
   Property,
   PropertyType,
   City,
@@ -12,15 +14,18 @@ const {
   PropertyCharacteristic,
   PropertyComodity,
   PropertyRoom,
-  Modification
+  Modification,
 } = require("../../../db/models");
 const { slugFormatter } = require("../../../utils/stringFormatter");
 const { validateLocation } = require("../location/helpers/validateLocation");
 const { createLocation } = require("../location/helpers/createLocation");
-const { findOrCreateCharacteristic } = require("../characteristics/helpers/findOrCreateCharacteristic");
+const {
+  findOrCreateCharacteristic,
+} = require("../characteristics/helpers/findOrCreateCharacteristic");
 const { findOrCreateRoom } = require("../rooms/helpers/findOrCreateRoom");
-const { findOrCreateComodities } = require("../comodities/helpers/findOrCreateComodities");
-
+const {
+  findOrCreateComodities,
+} = require("../comodities/helpers/findOrCreateComodities");
 
 //CREATE PROPERTY SERVICES
 const createPropertyRegistry = async (tenantId, userId, propertyData) => {
@@ -51,7 +56,6 @@ const createPropertyRegistry = async (tenantId, userId, propertyData) => {
     throw new AppError("Missing property type", 400);
   }
 
-  console.log(propertyType, "propertyType");
 
   const property = await Property.create({
     title: propertyData.title,
@@ -60,7 +64,6 @@ const createPropertyRegistry = async (tenantId, userId, propertyData) => {
     tenantId,
   });
 
-  console.log(property, "property");
 
   return property;
 };
@@ -118,6 +121,9 @@ const addPropertyLocation = async (
 
   if (!property) throw new AppError("Invalid property", 400);
 
+  console.log(propertyData, 'body location');
+  
+
   // === COUNTRY ===
   let countryId;
   if (propertyData.country.exists === true) {
@@ -158,8 +164,6 @@ const addPropertyLocation = async (
   }
 
   // === CITY ===
-  console.log(provinceId, "provinceId");
-
   let cityId;
   if (propertyData.city.exists === true) {
     const city = await validateLocation(propertyData.city.value, "city");
@@ -176,7 +180,6 @@ const addPropertyLocation = async (
   }
 
   // === NEIGHBORHOOD ===
-  console.log(cityId, "cityId");
 
   let neighborhoodId;
   if (propertyData.neighborhood.exists === true) {
@@ -275,10 +278,7 @@ const addPropertyComodities = async (
 
   const propertyComodities = await Promise.all(
     propertyData.comodities.map(async (com) => {
-      const foundComodity = await findOrCreateComodities(
-        com,
-        tenantId
-      );
+      const foundComodity = await findOrCreateComodities(com, tenantId);
       return await PropertyComodity.create({
         propertyId,
         comodityId: foundComodity.id,
@@ -288,10 +288,9 @@ const addPropertyComodities = async (
   );
 
   return propertyComodities;
-
 };
 
-const addPropertyRooms = async (propertyId,tenantId,userId,propertyData) => {
+const addPropertyRooms = async (propertyId, tenantId, userId, propertyData) => {
   const property = await Property.findOne({
     where: { id: propertyId, tenantId },
   });
@@ -303,85 +302,89 @@ const addPropertyRooms = async (propertyId,tenantId,userId,propertyData) => {
 
   const propertyRooms = await Promise.all(
     propertyData.rooms.map(async (room) => {
-      const foundRoom = await findOrCreateRoom(
-        room,
-        tenantId
-      );
-       return await PropertyRoom.create({
-         propertyId,
-         roomId: foundRoom.id,
-         size: room.size || null,
-         value: room.quantity || 1,
-         tenantId,
-       });
+      const foundRoom = await findOrCreateRoom(room, tenantId);
+      return await PropertyRoom.create({
+        propertyId,
+        roomId: foundRoom.id,
+        size: room.size || null,
+        value: room.quantity || 1,
+        tenantId,
+      });
     })
   );
-  
-  return propertyRooms;
 
+  return propertyRooms;
 };
 
-const publishProperty = async ( propertyId, tenant, userId) => {
-
+const publishProperty = async (propertyId, tenant, userId) => {
   const property = await Property.findOne({
-    where: { id: propertyId, tenantId: tenant.id },
-    include: [
-      { model: PropertyType, attributes: ["name"] },
-      { model: PropertyType, attributes: ["name"] },
-      { model: City, attributes: ["name"] },
-      { model: Province, attributes: ["name"] },
-      { model: Country, attributes: ["name"] },
-      { model: Neighborhood, attributes: ["name"] },
-      {
-        model: Comodity,
-        through: { attributes: [] },
-        attributes: ["name", "id"],
-      },
-      {
-        model: Characteristic,
-        through: { attributes: [] },
-        attributes: ["name", "id"],
-      },
-      {
-        model: Room,
-        through: { attributes: [] },
-        attributes: ["name", "id"],
-      },
-      {
-        model: Tenant,
-        through: { attributes: [] },
-        attributes: ["name"],
-      },
-    ]
-  });
+  where: { id: propertyId, tenantId: tenant.id },
+  include: [
+    { model: PropertyType, attributes: ["name"] },
+    { model: City, attributes: ["name"] },
+    { model: Province, attributes: ["name"] },
+    { model: Country, attributes: ["name"] },
+    { model: Neighborhood, attributes: ["name"] },
+    {
+      model: Comodity,
+      through: { attributes: [] },
+      attributes: ["name", "id"],
+    },
+    {
+      model: Characteristic,
+      through: { attributes: [] },
+      attributes: ["name", "id"],
+    },
+    {
+      model: Room,
+      through: { attributes: [] },
+      attributes: ["name", "id"],
+    },
+    {
+      model: Tenant,
+      attributes: ["name"],
+    },
+  ],
+});
+
 
   if (!property) throw new AppError("Invalid property", 400);
+
+  console.log(property, 'propiedad');
+  
   const shortId = nanoid(6);
   const propertySlug = slugFormatter(
     `${
-      operation === "sale"
+      property.operation === "sale"
         ? "venta"
-        : operation === "rent"
+        : propertyoperation === "rent"
         ? "alquiler"
         : "short-term"
-    } ${property.title} ${property.rooms} "ambientes" ${property.address} "en" ${property.city.name} ${
-      property.neighborhood.name
-    } ${property.price} ${property.priceFIAT} ${tenant.id} ${shortId}`
-  )
+    } ${property.title} ${property.rooms} "ambientes" ${
+      property.address
+    } "en" ${property.City.name} ${property.Neighborhood.name} ${
+      property.price
+    } ${property.priceFIAT} ${tenant.id} ${shortId}`
+  );
+
+  property.slug = propertySlug;
 
   property.status = "published";
 
+  console.log(property, 'property to publish');
+  
+
+  await property.save();
+  
   const modification = await Modification.create({
     propertyId: property.id,
     userId,
     tenantId: tenant.id,
-    metadata: { property }
-  })
+    metadata: { property },
+  });
 
-  await property.save();
 
   return property;
-
 };
 
 //OTHER SERVICES
@@ -469,5 +472,5 @@ module.exports = {
   putProperty,
   fetchPropertyTypes,
   getPropertyDetail,
-  publishProperty
+  publishProperty,
 };
