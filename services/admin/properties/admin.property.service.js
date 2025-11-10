@@ -82,8 +82,11 @@ const addPropertyData = async (propertyId, tenantId, userId, propertyData) => {
     property.priceFIAT = propertyData.price.currency;
   }
 
-  property.expenses = propertyData.expenses ?? null;
-  property.expensesFIAT = propertyData.expensesFIAT ?? null;
+  if (propertyData.expenses) {
+    property.expenses = propertyData.expenses.value;
+    property.expensesFIAT = propertyData.expenses.currency;
+  }
+
   property.operation = propertyData.operation ?? null;
   property.financing = propertyData.financing ?? null;
   property.rooms = propertyData.rooms ?? null;
@@ -357,7 +360,7 @@ const publishProperty = async (propertyId, tenant, userId) => {
     `${
       property.operation === "sale"
         ? "venta"
-        : propertyoperation === "rent"
+        : property.operation === "rent"
         ? "alquiler"
         : "short-term"
     } ${property.title} ${property.rooms} "ambientes" ${
